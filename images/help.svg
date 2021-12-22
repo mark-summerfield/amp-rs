@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   width="48.000000px"
+   height="48.000000px"
+   id="svg6361"
+   version="1.1">
+  <defs
+     id="defs3">
+    <linearGradient
+       id="linearGradient21644">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop21646" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop21648" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient21644"
+       id="radialGradient21650"
+       cx="25.125"
+       cy="36.75"
+       fx="25.125"
+       fy="36.75"
+       r="15.75"
+       gradientTransform="matrix(1.173803,0,0,0.3571428,-5.004403,29.25)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient2933">
+      <stop
+         id="stop2935"
+         offset="0"
+         style="stop-color:#9cbcde;stop-opacity:1" />
+      <stop
+         id="stop2937"
+         offset="1"
+         style="stop-color:#204a87" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient2933"
+       id="radialGradient2207"
+       cx="26.544321"
+       cy="28.458725"
+       fx="26.544321"
+       fy="28.458725"
+       r="22.376116"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.1621121,0.0055897,-0.00610716,1.268412,-4.9979929,-7.5133823)" />
+  </defs>
+  <metadata
+     id="metadata4">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+        <dc:date>2005-11-06</dc:date>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Tuomas Kuosmanen</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>help</rdf:li>
+            <rdf:li>browser</rdf:li>
+            <rdf:li>documentation</rdf:li>
+            <rdf:li>docs</rdf:li>
+            <rdf:li>man</rdf:li>
+            <rdf:li>info</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/publicdomain/" />
+        <dc:contributor>
+          <cc:Agent>
+            <dc:title>Jakub Steiner, Andreas Nilsson</dc:title>
+          </cc:Agent>
+        </dc:contributor>
+        <dc:source>http://tigert.com</dc:source>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <path
+     d="m 42.974795,42.375 a 18.487397,5.6250001 0 1 1 -36.9747949,0 18.487397,5.6250001 0 1 1 36.9747949,0 z"
+     id="path21642"
+     style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.63068183;fill:url(#radialGradient21650);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.83921498;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none" />
+  <path
+     d="m 44.530796,23.998696 a 20.529466,20.534673 0 1 1 -41.0589319,0 20.529466,20.534673 0 1 1 41.0589319,0 z"
+     id="path2093"
+     style="fill:url(#radialGradient2207);fill-opacity:1;stroke:#204a87;stroke-width:0.93856096" />
+  <path
+     style="opacity:0.96022728;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:2.59179091;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="path2209"
+     d="m 42.706319,24.001142 a 18.706332,18.708739 0 1 1 -37.4126645,0 18.706332,18.708739 0 1 1 37.4126645,0 z" />
+  <text
+     id="text3000-3"
+     y="36.374706"
+     x="15.529531"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:Verdana;-inkscape-font-specification:'Verdana Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#cccccc;fill-opacity:1;stroke:none"
+     xml:space="preserve"><tspan
+       style="font-size:32px;line-height:1.25"
+       y="36.374706"
+       x="15.529531"
+       id="tspan3002-7">?</tspan></text>
+  <g
+     id="text3000"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:Verdana;-inkscape-font-specification:'Verdana Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none"
+     aria-label="?">
+    <path
+       id="path838"
+       style="font-size:32px;line-height:1.25"
+       d="m 25.995,27.854572 h -5.640625 v -0.765625 q 0,-1.28125 0.515625,-2.265625 0.515625,-1 2.171875,-2.53125 l 1,-0.90625 q 0.890625,-0.8125 1.296875,-1.53125 0.421875,-0.71875 0.421875,-1.4375 0,-1.09375 -0.75,-1.703125 -0.75,-0.625 -2.09375,-0.625 -1.265625,0 -2.734375,0.53125 -1.46875,0.515625 -3.0625,1.546875 v -4.90625 q 1.890625,-0.65625 3.453125,-0.96875 1.5625,-0.3125 3.015625,-0.3125 3.8125,0 5.8125,1.5625 2,1.546875 2,4.53125 0,1.53125 -0.609375,2.75 -0.609375,1.203125 -2.078125,2.59375 l -1,0.890625 q -1.0625,0.96875 -1.390625,1.5625 Q 25.995,26.448322 25.995,27.151447 Z m -5.640625,2.3125 H 25.995 v 5.5625 h -5.640625 z" />
+  </g>
+</svg>

@@ -1,0 +1,30 @@
+[package]
+name = "Template"
+version = "0.1.0"
+edition = "2021"
+publish = false # TODO
+authors = [ "Mark Summerfield <mark@qtrac.eu>",]
+include = [ "Cargo.toml", "src/**/*.rs", "images/*",]
+description = "" # TODO
+homepage = "https://github.com/mark-summerfield/template-rs" # TODO
+readme = "README.md"
+keywords = [ "fltk"]
+categories = [ ]
+license = "GPL-3.0"
+
+[badges.maintenance]
+status = "passively-maintained"
+
+[profile.release]
+codegen-units = 1
+# lto = "fat" # TODO
+
+[dependencies]
+chrono = "^0.4"
+dirs = "^4"
+fltk = { version = "^1.2", features = ["no-pango",], git = "https://github.com/fltk-rs/fltk-rs" }
+num = "^0.4"
+rust-ini = "^0.17"
+rustc_version_runtime = "0.1.*"
+soloud = { git = "https://github.com/moalyousef/soloud-rs" }
+state = "^0.5"

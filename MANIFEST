@@ -1,0 +1,18 @@
+src/main.rs
+src/config.rs
+src/application.rs
+src/mainwindow.rs
+src/html_form.rs
+src/options_form.rs
+src/fixed.rs # VERSION
+src/util.rs
+
+Cargo.toml
+
+README.md
+st.sh
+
+deploy.sh
+deploy.bat
+
+# vim: syn=yaml
