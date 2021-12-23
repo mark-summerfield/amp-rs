@@ -211,7 +211,7 @@ fn add_slider_row(
     icon_label.set_image(Some(icon_image));
     let slider = fltk::valuator::HorNiceSlider::default();
     let mut label = fltk::frame::Frame::default().with_label(&label);
-    label.set_frame(fltk::enums::FrameType::EmbossedFrame);
+    label.set_frame(fltk::enums::FrameType::EngravedFrame);
     row.set_size(&icon_label, icon_width);
     row.set_size(&label, icon_width * 2);
     row.end();

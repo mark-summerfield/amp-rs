@@ -13,7 +13,7 @@ pub struct Config {
     pub window_height: i32,
     pub window_width: i32,
     pub window_scale: f32,
-    //pub volume: f64, // TODO
+    //pub volume: f64, // TODO in TRACK_SECTION [Track]
     //pub pos: f64,
     //pub track: std::path::PathBuf,
     pub filename: std::path::PathBuf,

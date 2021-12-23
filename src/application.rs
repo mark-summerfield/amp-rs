@@ -39,6 +39,7 @@ impl Application {
         widgets.mainwindow.show();
         Self {
             app,
+            helpform: None,
             mainwindow: widgets.mainwindow,
             play_pause_button: widgets.play_pause_button,
             info_view: widgets.info_view,
@@ -46,7 +47,6 @@ impl Application {
             volume_label: widgets.volume_label,
             time_slider: widgets.time_slider,
             time_label: widgets.time_label,
-            helpform: None,
             receiver,
         }
     }
@@ -56,18 +56,10 @@ impl Application {
             if let Some(action) = self.receiver.recv() {
                 match action {
                     Action::Load => self.on_open(),
-                    Action::Previous => {
-                        dbg!("Previous"); // TODO
-                    }
-                    Action::Replay => {
-                        dbg!("Replay"); // TODO
-                    }
-                    Action::PlayOrPause => {
-                        dbg!("PlayOrPause"); // TODO
-                    }
-                    Action::Next => {
-                        dbg!("Next"); // TODO
-                    }
+                    Action::Previous => self.on_previous(),
+                    Action::Replay => self.on_replay(),
+                    Action::PlayOrPause => self.on_play_or_pause(),
+                    Action::Next => self.on_next(),
                     Action::Options => self.on_options(),
                     Action::About => self.on_about(),
                     Action::Help => self.on_help(),
@@ -78,7 +70,23 @@ impl Application {
     }
 
     pub fn on_open(&mut self) {
-        dbg!("on_open");
+        dbg!("on_open"); // TODO
+    }
+
+    fn on_previous(&mut self) {
+        dbg!("Previous"); // TODO
+    }
+
+    fn on_replay(&mut self) {
+        dbg!("Replay"); // TODO
+    }
+
+    fn on_play_or_pause(&mut self) {
+        dbg!("Play or Pause"); // TODO
+    }
+
+    fn on_next(&mut self) {
+        dbg!("Next"); // TODO
     }
 
     fn on_options(&mut self) {
