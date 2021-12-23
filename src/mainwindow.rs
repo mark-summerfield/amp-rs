@@ -206,11 +206,11 @@ fn add_slider_row(
     icon_label.set_size(icon_width, icon_height);
     icon_label.visible_focus(false);
     icon_label.set_label_size(0);
-    let mut icon_image = fltk::image::SvgImage::from_data(&icon).unwrap();
+    let mut icon_image = fltk::image::SvgImage::from_data(icon).unwrap();
     icon_image.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
     icon_label.set_image(Some(icon_image));
     let slider = fltk::valuator::HorFillSlider::default();
-    let mut label = fltk::frame::Frame::default().with_label(&label);
+    let mut label = fltk::frame::Frame::default().with_label(label);
     label.set_frame(fltk::enums::FrameType::EngravedFrame);
     row.set_size(&icon_label, icon_width);
     row.set_size(&label, icon_width * 2);
@@ -252,34 +252,28 @@ pub fn add_event_handlers(
         }
     });
     mainwindow.handle(move |_, event| {
-        if event == fltk::enums::Event::KeyUp
-            && fltk::app::event_key().bits() == 0x20
-        {
-            sender.send(Action::PlayOrPause); // Space
-            return true;
+        if event == fltk::enums::Event::KeyUp {
+            if fltk::app::event_key().bits() == 0x20 {
+                sender.send(Action::PlayOrPause); // Space
+                return true;
+            }
+            if fltk::app::event_key().bits() == 0x2B
+                || fltk::app::event_key().bits() == 0x3D
+            {
+                sender.send(Action::VolumeUp); // + or =
+                return true;
+            }
+            if fltk::app::event_key().bits() == 0x2D {
+                sender.send(Action::VolumeDown); // -
+                return true;
+            }
+            if fltk::app::event_key() == fltk::enums::Key::Help
+                || fltk::app::event_key() == fltk::enums::Key::F1
+            {
+                sender.send(Action::Help);
+                return true;
+            }
         }
-        if event == fltk::enums::Event::KeyUp
-            && (fltk::app::event_key().bits() == 0x2B
-                || fltk::app::event_key().bits() == 0x3D)
-        {
-            sender.send(Action::VolumeUp); // + or =
-            return true;
-        }
-        if event == fltk::enums::Event::KeyUp
-            && fltk::app::event_key().bits() == 0x2D
-        {
-            sender.send(Action::VolumeDown); // -
-            return true;
-        }
-        match event {
-            fltk::enums::Event::KeyUp => match fltk::app::event_key() {
-                fltk::enums::Key::Help | fltk::enums::Key::F1 => {
-                    sender.send(Action::Help);
-                    true
-                }
-                _ => false,
-            },
-            _ => false,
-        }
+        false
     });
 }

@@ -104,7 +104,7 @@ impl Application {
     }
 
     fn on_about(&mut self) {
-        html_form::Form::new("About", &about_html(), true, 450, 300, false);
+        html_form::Form::new("About", &about_html(), true, 480, 300, false);
     }
 
     fn on_help(&mut self) {

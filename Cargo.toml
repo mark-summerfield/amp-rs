@@ -25,6 +25,6 @@ dirs = "^4"
 fltk = { version = "^1.2", features = ["no-pango",], git = "https://github.com/fltk-rs/fltk-rs" }
 num = "^0.4"
 rust-ini = "^0.17"
-rustc_version_runtime = "0.1.*"
+rustc_version_runtime = "^0.2"
 soloud = { git = "https://github.com/moalyousef/soloud-rs" }
 state = "^0.5"

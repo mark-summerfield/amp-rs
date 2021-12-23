@@ -23,13 +23,14 @@ impl Form {
             fltk::group::Flex::default().size_of_parent().column();
         vbox.set_margin(PAD);
         vbox.set_pad(PAD);
-        let spinners = make_spinners();
+        let mut spinners = make_spinners();
         let (button_row, mut buttons) = make_buttons();
         vbox.set_size(&button_row, BUTTON_HEIGHT);
         vbox.end();
         form.end();
         form.make_modal(true);
         add_event_handlers(&mut form, &spinners, &mut buttons, ok.clone());
+        spinners.scale_spinner.take_focus().unwrap();
         form.show();
         while form.shown() {
             fltk::app::wait();
@@ -56,7 +57,7 @@ struct Buttons {
 fn make_form() -> fltk::window::Window {
     let image = fltk::image::SvgImage::from_data(ICON).unwrap();
     let mut form = fltk::window::Window::default()
-        .with_size(200, 200)
+        .with_size(200, 80)
         .with_label(&format!("Configure — {}", APPNAME));
     if let Some(window) = fltk::app::first_window() {
         form.set_pos(window.x() + 50, window.y() + 100);
@@ -91,6 +92,7 @@ fn make_row(
         .with_label(label)
         .with_align(fltk::enums::Align::Inside | fltk::enums::Align::Left);
     label.set_frame(fltk::enums::FrameType::NoBox);
+    label.clear_visible_focus();
     let mut spinner = fltk::misc::Spinner::default();
     spinner.set_value(value);
     spinner.set_step(step);

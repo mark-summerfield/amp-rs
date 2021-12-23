@@ -58,17 +58,22 @@ pub fn about_html() -> String {
         format!("2021-{}", year - 2000)
     };
     format!(
-        "<font face=\"Helvetica\"><center>
-<h1><font color=\"navy\">{} v{}</font></h1>
-<h4>
-<a href=\"http://www.qtrac.eu/template.html\">www.qtrac.eu/template.html</a>
-</h4>
-<h5><font face=\"Helvetica\"
-color=\"green\">Copyright © {} Mark Summerfield.<br>
-All rights reserved.</font></h5>
-<h5><font face=\"Helvetica\" color=\"green\">License: GPLv3.</font></h5>
-<p>Rust {} • fltk-rs {} • FLTK {} • {}/{}</p>
-</center></font>",
+        "<p><center><font size=6 color=navy><b>{}</b> v{}</font>
+</center></p>
+<p><center><font color=navy size=5>“Another Music Player‟</font>
+</center></p>
+<p><center><font size=4>
+<a href=\"http://www.qtrac.eu/amp.html\">www.qtrac.eu/amp.html</a>
+</font></center></p>
+<p><center>
+<font size=4 color=green>
+Copyright © {} Mark Summerfield.<br>
+All rights reserved.<br>
+License: GPLv3.</font>
+</center></p>
+<p><center><font size=4 color=#555>
+Rust {} • fltk-rs {} • FLTK {} • {}/{}
+</font></center></p>",
         APPNAME,
         VERSION,
         year,
@@ -80,20 +85,12 @@ All rights reserved.</font></h5>
     )
 }
 
+// TODO update table with keyboard shortcuts
 pub static HELP_HTML: &str = "<body>
-<p><center><font color=navy size=7em><b>Template</b></font></center></p>
-<font color=blue size=5em>The purpose of the game is to remove all the
-tiles.</font>
+<p><center><font color=navy size=6><b>AMP</b></font></center></p>
+<p><center><font color=blue size=5>“Another Music Player‟</font>
+</center></p>
 <p>
-<font color=#008000 size=4em>
-Click a tile that has at least one vertically or horizontally adjoining tile
-of the same color to remove it and any vertically or horizontally adjoining
-tiles of the same color, and <i>their</i> vertically or horizontally
-adjoining tiles, and so on. <i>(So clicking a tile with no adjoining tiles
-of the same color does nothing.)</i> The more tiles that are removed in one
-go, the higher the score.
-</font>
-</p>
 <table border=1 align=center>
 <font color=blue>
 <tr><th>Key</th><th>Action</th></tr>
@@ -109,8 +106,4 @@ go, the higher the score.
 <tr><td><b>Space</b></td><td>Click the focused tile</td></tr>
 </font>
 </table>
-<font color=#008000>
-Template works like TileFall and the SameGame except that instead of tiles
-falling to the bottom and moving off to the left, they “template” to the
-middle.</font>
 </body>";
