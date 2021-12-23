@@ -1,7 +1,7 @@
 // Copyright © 2021 Mark Summerfield. All rights reserved.
 // License: GPLv3
 
-use std::{cmp, fmt, str};
+use std::{cmp, str};
 
 pub fn x() -> i32 {
     (fltk::app::screen_size().0 / 2.0) as i32
@@ -30,41 +30,10 @@ where
     }
 }
 
-
 pub fn isclose32(a: f32, b: f32) -> bool {
     (a..=(a + f32::EPSILON)).contains(&b)
 }
 
 pub fn isone32(n: f32) -> bool {
     (1.0..=(1.0 + f32::EPSILON)).contains(&n)
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Pos {
-    pub x: i32,
-    pub y: i32,
-}
-
-impl Pos {
-    pub const INVALID: i32 = -1;
-
-    pub fn new(x: i32, y: i32) -> Self {
-        Self { x, y }
-    }
-
-    pub fn is_valid(&self) -> bool {
-        self.x != Pos::INVALID && self.y != Pos::INVALID
-    }
-}
-
-impl Default for Pos {
-    fn default() -> Self {
-        Self { x: Pos::INVALID, y: Pos::INVALID }
-    }
-}
-
-impl std::fmt::Display for Pos {
-    fn fmt(&self, out: &mut std::fmt::Formatter) -> fmt::Result {
-        write!(out, "({},{})", self.x, self.y)
-    }
 }

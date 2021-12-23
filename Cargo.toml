@@ -1,12 +1,12 @@
 [package]
-name = "Template"
+name = "AMP"
 version = "0.1.0"
 edition = "2021"
 publish = false # TODO
 authors = [ "Mark Summerfield <mark@qtrac.eu>",]
 include = [ "Cargo.toml", "src/**/*.rs", "images/*",]
-description = "" # TODO
-homepage = "https://github.com/mark-summerfield/template-rs" # TODO
+description = "AMP (Another Music Player)"
+homepage = "https://github.com/mark-summerfield/amp-rs" # TODO
 readme = "README.md"
 keywords = [ "fltk"]
 categories = [ ]

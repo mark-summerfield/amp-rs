@@ -1,5 +1,5 @@
 src/main.rs
-src/config.rs
+src/config.rs # TODO add support for load/save volume/pos/track
 src/application.rs
 src/mainwindow.rs
 src/html_form.rs

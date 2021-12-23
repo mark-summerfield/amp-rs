@@ -25,7 +25,6 @@ pub const OPTIONS_ICON: &str = include_str!("../images/options.svg");
 pub const ABOUT_ICON: &str = include_str!("../images/about.svg");
 pub const HELP_ICON: &str = include_str!("../images/help.svg");
 pub const QUIT_ICON: &str = include_str!("../images/quit.svg");
-pub const SIZE: usize = 9;
 pub const PAD: i32 = 6;
 pub const WINDOW_WIDTH_MIN: i32 = 440;
 pub const WINDOW_HEIGHT_MIN: i32 = 160;
@@ -35,8 +34,6 @@ pub const BUTTON_HEIGHT: i32 = 30;
 pub const BUTTON_WIDTH: i32 = 70;
 pub const SCALE_MIN: f32 = 0.5;
 pub const SCALE_MAX: f32 = 3.5;
-pub const MESSAGE_DELAY: f64 = 10.0; // seconds
-pub const TINY_DELAY: f64 = 0.005; // seconds
 
 #[derive(Copy, Clone, Debug)]
 pub enum Action {

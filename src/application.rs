@@ -33,11 +33,11 @@ impl Application {
         widgets.mainwindow.size_range(
             WINDOW_WIDTH_MIN,
             WINDOW_HEIGHT_MIN,
+            1024,
             800,
-            400,
         );
         widgets.mainwindow.show();
-        let mut app = Self {
+        Self {
             app,
             mainwindow: widgets.mainwindow,
             play_pause_button: widgets.play_pause_button,
@@ -48,8 +48,7 @@ impl Application {
             time_label: widgets.time_label,
             helpform: None,
             receiver,
-        };
-        app
+        }
     }
 
     pub fn run(&mut self) {
@@ -87,7 +86,7 @@ impl Application {
     }
 
     fn on_about(&mut self) {
-        html_form::Form::new("About", &about_html(), true, 400, 300, false);
+        html_form::Form::new("About", &about_html(), true, 450, 300, false);
     }
 
     fn on_help(&mut self) {
