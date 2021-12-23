@@ -253,9 +253,22 @@ pub fn add_event_handlers(
     });
     mainwindow.handle(move |_, event| {
         if event == fltk::enums::Event::KeyUp
-            && fltk::app::event_key().bits() == 32
+            && fltk::app::event_key().bits() == 0x20
         {
             sender.send(Action::PlayOrPause); // Space
+            return true;
+        }
+        if event == fltk::enums::Event::KeyUp
+            && (fltk::app::event_key().bits() == 0x2B
+                || fltk::app::event_key().bits() == 0x3D)
+        {
+            sender.send(Action::VolumeUp); // + or =
+            return true;
+        }
+        if event == fltk::enums::Event::KeyUp
+            && fltk::app::event_key().bits() == 0x2D
+        {
+            sender.send(Action::VolumeDown); // -
             return true;
         }
         match event {

@@ -60,6 +60,8 @@ impl Application {
                     Action::Replay => self.on_replay(),
                     Action::PlayOrPause => self.on_play_or_pause(),
                     Action::Next => self.on_next(),
+                    Action::VolumeDown => self.on_volume_down(),
+                    Action::VolumeUp => self.on_volume_up(),
                     Action::Options => self.on_options(),
                     Action::About => self.on_about(),
                     Action::Help => self.on_help(),
@@ -87,6 +89,14 @@ impl Application {
 
     fn on_next(&mut self) {
         dbg!("Next"); // TODO
+    }
+
+    fn on_volume_down(&mut self) {
+        dbg!("on_volume_down"); // TODO
+    }
+
+    fn on_volume_up(&mut self) {
+        dbg!("on_volume_up"); // TODO
     }
 
     fn on_options(&mut self) {
