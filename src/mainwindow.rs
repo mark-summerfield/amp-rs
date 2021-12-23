@@ -3,16 +3,24 @@
 
 use super::CONFIG;
 use crate::fixed::{
-    Action, ABOUT_ICON, APPNAME, HELP_ICON, ICON, LOAD_ICON, NEXT_ICON,
-    OPTIONS_ICON, PAD, PLAY_ICON, PREV_ICON, QUIT_ICON, REPLAY_ICON,
-    TOOLBAR_HEIGHT, TOOLBUTTON_SIZE,
+    Action, ABOUT_ICON, APPNAME, BUTTON_HEIGHT, HELP_ICON, ICON, LOAD_ICON,
+    NEXT_ICON, OPTIONS_ICON, PAD, PLAY_ICON, PREV_ICON, QUIT_ICON,
+    REPLAY_ICON, TIME_ICON, TOOLBAR_HEIGHT, TOOLBUTTON_SIZE, VOLUME_ICON,
 };
 use crate::util;
 use fltk::prelude::*;
 
-pub fn make(
-    sender: fltk::app::Sender<Action>,
-) -> (fltk::window::Window, fltk::button::Button) {
+pub struct Widgets {
+    pub mainwindow: fltk::window::Window,
+    pub play_pause_button: fltk::button::Button,
+    pub info_view: fltk::misc::HelpView,
+    pub volume_slider: fltk::valuator::HorNiceSlider,
+    pub volume_label: fltk::frame::Frame,
+    pub time_slider: fltk::valuator::HorNiceSlider,
+    pub time_label: fltk::frame::Frame,
+}
+
+pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
     fltk::window::Window::set_default_xclass(APPNAME);
     let icon = fltk::image::SvgImage::from_data(ICON).unwrap();
     let (x, y, width, height) = get_config_window_rect();
@@ -26,18 +34,29 @@ pub fn make(
         .size_of_parent()
         .with_type(fltk::group::FlexType::Column);
     vbox.set_margin(PAD);
-    // TODO replace with
-    // 1. fltk::misc::HelpView to show track info
-    // 2. volume label, volume slider, volume percent label
-    // 3. position label, position slider, position time label
-    fltk::frame::Frame::default()
-        .with_label("Central Area");
-    // END TODO
+    let mut info_view = fltk::misc::HelpView::default();
+    info_view
+        .set_value("<font color=green>Click Open to load a track…</font>");
+    info_view.set_text_font(fltk::enums::Font::Helvetica);
+    info_view.set_text_size((info_view.text_size() as f64 * 1.5) as i32);
+    let (mut volume_box, volume_slider, volume_label) =
+        add_volume_row(width);
+    vbox.set_size(&volume_box, BUTTON_HEIGHT);
+    let (mut time_box, time_slider, time_label) = add_time_row(width);
+    vbox.set_size(&time_box, BUTTON_HEIGHT);
     let (play_pause_button, toolbar) = add_toolbar(sender, width);
     vbox.set_size(&toolbar, TOOLBAR_HEIGHT);
     vbox.end();
     mainwindow.end();
-    (mainwindow, play_pause_button)
+    Widgets {
+        mainwindow,
+        play_pause_button,
+        info_view,
+        volume_slider,
+        volume_label,
+        time_slider,
+        time_label,
+    }
 }
 
 fn add_toolbar(
@@ -149,6 +168,64 @@ fn add_toolbutton(
     button.emit(sender, action);
     button_box.set_size(&button, width);
     button
+}
+
+fn add_volume_row(
+    width: i32,
+) -> (fltk::group::Flex, fltk::valuator::HorNiceSlider, fltk::frame::Frame)
+{
+    let mut volume_box = fltk::group::Flex::default()
+        .with_size(width, TOOLBAR_HEIGHT)
+        .with_type(fltk::group::FlexType::Row);
+    volume_box.set_margin(PAD / 2);
+    let icon_height = TOOLBUTTON_SIZE + PAD;
+    let icon_width = icon_height + 8;
+    let mut volume_icon = fltk::frame::Frame::default();
+    volume_icon.set_size(icon_width, icon_height);
+    volume_icon.visible_focus(false);
+    volume_icon.set_label_size(0);
+    let mut icon = fltk::image::SvgImage::from_data(VOLUME_ICON).unwrap();
+    icon.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
+    volume_icon.set_image(Some(icon));
+    let mut volume_slider = fltk::valuator::HorNiceSlider::default();
+    volume_slider.set_range(0.0, 1.0);
+    volume_slider.set_step(1.0, 10); // 1/10
+    {
+        let config = CONFIG.get().read().unwrap();
+        //volume_slider.set_value(config.volume); / TODO
+    }
+    let mut volume_label = fltk::frame::Frame::default().with_label("0%");
+    volume_label.set_frame(fltk::enums::FrameType::EngravedFrame);
+    volume_box.set_size(&volume_icon, icon_width);
+    volume_box.set_size(&volume_label, icon_width * 2);
+    volume_box.end();
+    (volume_box, volume_slider, volume_label)
+}
+
+fn add_time_row(
+    width: i32,
+) -> (fltk::group::Flex, fltk::valuator::HorNiceSlider, fltk::frame::Frame)
+{
+    let mut time_box = fltk::group::Flex::default()
+        .with_size(width, TOOLBAR_HEIGHT)
+        .with_type(fltk::group::FlexType::Row);
+    time_box.set_margin(PAD / 2);
+    let icon_height = TOOLBUTTON_SIZE + PAD;
+    let icon_width = icon_height + 8;
+    let mut time_icon = fltk::frame::Frame::default();
+    time_icon.set_size(icon_width, icon_height);
+    time_icon.visible_focus(false);
+    time_icon.set_label_size(0);
+    let mut icon = fltk::image::SvgImage::from_data(TIME_ICON).unwrap();
+    icon.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
+    time_icon.set_image(Some(icon));
+    let mut time_slider = fltk::valuator::HorNiceSlider::default();
+    let mut time_label = fltk::frame::Frame::default().with_label("0″/0″");
+    time_label.set_frame(fltk::enums::FrameType::EmbossedFrame);
+    time_box.set_size(&time_icon, icon_width);
+    time_box.set_size(&time_label, icon_width * 2);
+    time_box.end();
+    (time_box, time_slider, time_label)
 }
 
 fn get_config_window_rect() -> (i32, i32, i32, i32) {

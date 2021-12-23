@@ -2,7 +2,9 @@
 // License: GPLv3
 
 use super::CONFIG;
-use crate::fixed::{about_html, Action, HELP_HTML};
+use crate::fixed::{
+    about_html, Action, HELP_HTML, WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
+};
 use crate::html_form;
 use crate::mainwindow;
 use crate::options_form;
@@ -12,6 +14,11 @@ pub struct Application {
     app: fltk::app::App,
     mainwindow: fltk::window::Window,
     play_pause_button: fltk::button::Button,
+    info_view: fltk::misc::HelpView,
+    volume_slider: fltk::valuator::HorNiceSlider,
+    volume_label: fltk::frame::Frame,
+    time_slider: fltk::valuator::HorNiceSlider,
+    time_label: fltk::frame::Frame,
     helpform: Option<html_form::Form>,
     receiver: fltk::app::Receiver<Action>,
 }
@@ -21,14 +28,24 @@ impl Application {
         let app =
             fltk::app::App::default().with_scheme(fltk::app::Scheme::Gleam);
         let (sender, receiver) = fltk::app::channel::<Action>();
-        let (mut mainwindow, play_pause_button) = mainwindow::make(sender);
-        mainwindow::add_event_handlers(&mut mainwindow, sender);
-        mainwindow.size_range(440, 160, 800, 400);
-        mainwindow.show();
+        let mut widgets = mainwindow::make(sender);
+        mainwindow::add_event_handlers(&mut widgets.mainwindow, sender);
+        widgets.mainwindow.size_range(
+            WINDOW_WIDTH_MIN,
+            WINDOW_HEIGHT_MIN,
+            800,
+            400,
+        );
+        widgets.mainwindow.show();
         let mut app = Self {
             app,
-            mainwindow,
-            play_pause_button,
+            mainwindow: widgets.mainwindow,
+            play_pause_button: widgets.play_pause_button,
+            info_view: widgets.info_view,
+            volume_slider: widgets.volume_slider,
+            volume_label: widgets.volume_label,
+            time_slider: widgets.time_slider,
+            time_label: widgets.time_label,
             helpform: None,
             receiver,
         };

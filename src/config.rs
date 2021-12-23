@@ -1,8 +1,9 @@
 // Copyright © 2021 Mark Summerfield. All rights reserved.
 // License: GPLv3
 
-// TODO load/save track/pos/volume
-use crate::fixed::{APPNAME, SCALE_MAX, SCALE_MIN};
+use crate::fixed::{
+    APPNAME, SCALE_MAX, SCALE_MIN, WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
+};
 use crate::util;
 
 #[derive(Clone, Debug)]
@@ -12,6 +13,9 @@ pub struct Config {
     pub window_height: i32,
     pub window_width: i32,
     pub window_scale: f32,
+    //pub volume: f64, // TODO
+    //pub pos: f64,
+    //pub track: std::path::PathBuf,
     pub filename: std::path::PathBuf,
 }
 
@@ -98,12 +102,20 @@ fn read_window_properties(
         config.window_y = util::get_num(value, 0, max_y, config.window_y)
     }
     if let Some(value) = properties.get(WIDTH_KEY) {
-        config.window_width =
-            util::get_num(value, 200, max_x, config.window_width)
+        config.window_width = util::get_num(
+            value,
+            WINDOW_WIDTH_MIN,
+            max_x,
+            config.window_width,
+        )
     }
     if let Some(value) = properties.get(HEIGHT_KEY) {
-        config.window_height =
-            util::get_num(value, 240, max_y, config.window_height)
+        config.window_height = util::get_num(
+            value,
+            WINDOW_HEIGHT_MIN,
+            max_y,
+            config.window_height,
+        )
     }
     if let Some(value) = properties.get(SCALE_KEY) {
         config.window_scale =
