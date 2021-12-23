@@ -55,7 +55,7 @@ impl Application {
         while self.app.wait() {
             if let Some(action) = self.receiver.recv() {
                 match action {
-                    Action::Load => self.on_load(),
+                    Action::Load => self.on_open(),
                     Action::Previous => {
                         dbg!("Previous"); // TODO
                     }
@@ -77,8 +77,8 @@ impl Application {
         }
     }
 
-    pub fn on_load(&mut self) {
-        dbg!("on_load");
+    pub fn on_open(&mut self) {
+        dbg!("on_open");
     }
 
     fn on_options(&mut self) {

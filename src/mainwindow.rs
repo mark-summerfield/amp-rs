@@ -76,7 +76,7 @@ fn add_toolbar(
     add_toolbutton(
         sender,
         'o',
-        "Open Track • o",
+        "Open a track ready to play • o",
         Action::Load,
         LOAD_ICON,
         &mut button_box,
@@ -84,7 +84,7 @@ fn add_toolbar(
     add_toolbutton(
         sender,
         'b',
-        "Back • b",
+        "Back to previous track • b",
         Action::Previous,
         PREV_ICON,
         &mut button_box,
@@ -92,7 +92,7 @@ fn add_toolbar(
     add_toolbutton(
         sender,
         'r',
-        "Replay • r",
+        "Replay the current track • r",
         Action::Replay,
         REPLAY_ICON,
         &mut button_box,
@@ -100,15 +100,15 @@ fn add_toolbar(
     let play_pause_button = add_toolbutton(
         sender,
         'p',
-        "Play/Pause • p or Space",
+        "Play or Pause the current track • p or Space",
         Action::PlayOrPause,
         PLAY_ICON,
         &mut button_box,
     );
     add_toolbutton(
         sender,
-        'n',
-        "Next • n",
+        'f',
+        "Forward to next track • f",
         Action::Next,
         NEXT_ICON,
         &mut button_box,
@@ -251,14 +251,22 @@ pub fn add_event_handlers(
             sender.send(Action::Quit);
         }
     });
-    mainwindow.handle(move |_, event| match event {
-        fltk::enums::Event::KeyUp => match fltk::app::event_key() {
-            fltk::enums::Key::Help | fltk::enums::Key::F1 => {
-                sender.send(Action::Help);
-                true
-            }
+    mainwindow.handle(move |_, event| {
+        if event == fltk::enums::Event::KeyUp
+            && fltk::app::event_key().bits() == 32
+        {
+            sender.send(Action::PlayOrPause); // Space
+            return true;
+        }
+        match event {
+            fltk::enums::Event::KeyUp => match fltk::app::event_key() {
+                fltk::enums::Key::Help | fltk::enums::Key::F1 => {
+                    sender.send(Action::Help);
+                    true
+                }
+                _ => false,
+            },
             _ => false,
-        },
-        _ => false,
+        }
     });
 }
