@@ -14,9 +14,9 @@ pub struct Widgets {
     pub mainwindow: fltk::window::Window,
     pub play_pause_button: fltk::button::Button,
     pub info_view: fltk::misc::HelpView,
-    pub volume_slider: fltk::valuator::HorNiceSlider,
+    pub volume_slider: fltk::valuator::HorFillSlider,
     pub volume_label: fltk::frame::Frame,
-    pub time_slider: fltk::valuator::HorNiceSlider,
+    pub time_slider: fltk::valuator::HorFillSlider,
     pub time_label: fltk::frame::Frame,
 }
 
@@ -177,7 +177,7 @@ fn add_toolbutton(
 
 fn add_volume_row(
     width: i32,
-) -> (fltk::group::Flex, fltk::valuator::HorNiceSlider, fltk::frame::Frame)
+) -> (fltk::group::Flex, fltk::valuator::HorFillSlider, fltk::frame::Frame)
 {
     let (volume_box, mut volume_slider, volume_label) =
         add_slider_row(width, VOLUME_ICON, "0%");
@@ -194,7 +194,7 @@ fn add_slider_row(
     width: i32,
     icon: &str,
     label: &str,
-) -> (fltk::group::Flex, fltk::valuator::HorNiceSlider, fltk::frame::Frame)
+) -> (fltk::group::Flex, fltk::valuator::HorFillSlider, fltk::frame::Frame)
 {
     let mut row = fltk::group::Flex::default()
         .with_size(width, TOOLBAR_HEIGHT)
@@ -209,7 +209,7 @@ fn add_slider_row(
     let mut icon_image = fltk::image::SvgImage::from_data(&icon).unwrap();
     icon_image.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
     icon_label.set_image(Some(icon_image));
-    let slider = fltk::valuator::HorNiceSlider::default();
+    let slider = fltk::valuator::HorFillSlider::default();
     let mut label = fltk::frame::Frame::default().with_label(&label);
     label.set_frame(fltk::enums::FrameType::EngravedFrame);
     row.set_size(&icon_label, icon_width);
