@@ -80,6 +80,7 @@ impl Application {
         if load {
             app.load_track();
         }
+        #[allow(clippy::clone_on_copy)]
         let sender = sender.clone();
         volume_slider.set_callback(move |_| {
             sender.send(Action::VolumeUpdate);
@@ -111,11 +112,10 @@ impl Application {
     }
 
     pub fn on_open(&mut self) {
-        // "Audio Files\t*.{oga,ogg,mp3}", FIXME This doesn't work right
         if let Some(filename) = fltk::dialog::file_chooser(
             &format!("Choose Track — {}", APPNAME),
-            "*.{oga,ogg,mp3}",
-            &util::get_track_dir().to_string_lossy(),
+            "Audio Files (*.{oga,ogg,mp3})",
+            &util::get_track_dir(),
             false,
         ) {
             {
