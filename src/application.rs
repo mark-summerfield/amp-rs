@@ -78,7 +78,7 @@ impl Application {
             receiver,
         };
         if load {
-            app.load_track();
+            app.load_track(true);
         }
         #[allow(clippy::clone_on_copy)]
         let sender = sender.clone();
@@ -123,7 +123,7 @@ impl Application {
                 config.track = std::path::PathBuf::from(filename);
                 config.pos = 0.0;
             }
-            self.load_track();
+            self.load_track(false);
         }
     }
 
@@ -137,14 +137,10 @@ impl Application {
 
     fn on_play_or_pause(&mut self) {
         let icon = if self.playing {
-            dbg!("PAUSE");
-            self.player.pause(self.handle);
+            self.player.set_pause(self.handle, true);
             PLAY_ICON
         } else {
-            dbg!("PLAY");
-            self.handle = self.player.play(&self.wav);
-            self.player
-                .set_volume(self.handle, self.volume_slider.value() as f32);
+            self.player.set_pause(self.handle, false);
             #[allow(clippy::clone_on_copy)]
             let sender = self.sender.clone();
             fltk::app::add_timeout(TICK_TIMEOUT, move || {
@@ -250,16 +246,33 @@ impl Application {
         }
     }
 
-    fn load_track(&mut self) {
+    fn load_track(&mut self, on_startup: bool) {
         let config = CONFIG.get().read().unwrap();
         let message = match self.wav.load(&config.track) {
             Ok(_) => {
+                self.handle = self.player.play(&self.wav);
+                self.player.set_pause(self.handle, true);
+                self.player.set_volume(
+                    self.handle,
+                    self.volume_slider.value() as f32,
+                );
                 self.time_slider.set_range(0.0, self.wav.length());
                 self.time_slider.set_step(self.wav.length(), 20);
-                self.time_label.set_label(&format!(
-                    "0″/{}″",
-                    self.wav.length().round()
-                ));
+                if on_startup {
+                    self.time_slider.set_value(config.pos);
+                    self.time_label.set_label(&format!(
+                        "{}″/{}″",
+                        config.pos.round(),
+                        self.wav.length().round()
+                    ));
+                    // Ignore if we fail
+                    let _ = self.player.seek(self.handle, config.pos);
+                } else {
+                    self.time_label.set_label(&format!(
+                        "0″/{}″",
+                        self.wav.length().round()
+                    ));
+                }
                 ON_LOAD.replace("FILE", &config.track.to_string_lossy())
             }
             Err(_) => {
