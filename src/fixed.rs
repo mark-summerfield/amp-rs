@@ -41,6 +41,7 @@ pub enum Action {
     Previous,
     Replay,
     PlayOrPause,
+    SpacePressed,
     Next,
     VolumeDown,
     VolumeUp,

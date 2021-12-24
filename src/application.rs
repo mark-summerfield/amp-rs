@@ -59,6 +59,7 @@ impl Application {
                     Action::Previous => self.on_previous(),
                     Action::Replay => self.on_replay(),
                     Action::PlayOrPause => self.on_play_or_pause(),
+                    Action::SpacePressed => self.on_space_pressed(),
                     Action::Next => self.on_next(),
                     Action::VolumeDown => self.on_volume_down(),
                     Action::VolumeUp => self.on_volume_up(),
@@ -85,6 +86,15 @@ impl Application {
 
     fn on_play_or_pause(&mut self) {
         dbg!("Play or Pause"); // TODO
+    }
+
+    fn on_space_pressed(&mut self) {
+        self.play_pause_button.set_value(true);
+        let mut play_pause_button = self.play_pause_button.clone();
+        fltk::app::add_timeout(0.075, move || {
+            play_pause_button.set_value(false);
+            play_pause_button.do_callback();
+        });
     }
 
     fn on_next(&mut self) {

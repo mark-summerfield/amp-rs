@@ -254,7 +254,7 @@ pub fn add_event_handlers(
     mainwindow.handle(move |_, event| {
         if event == fltk::enums::Event::KeyUp {
             if fltk::app::event_key().bits() == 0x20 {
-                sender.send(Action::PlayOrPause); // Space
+                sender.send(Action::SpacePressed); // Space → Play or Pause
                 return true;
             }
             if fltk::app::event_key().bits() == 0x2B
