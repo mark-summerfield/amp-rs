@@ -13,9 +13,9 @@ pub struct Config {
     pub window_height: i32,
     pub window_width: i32,
     pub window_scale: f32,
-    //pub volume: f64, // TODO in TRACK_SECTION [Track]
-    //pub pos: f64,
-    //pub track: std::path::PathBuf,
+    pub volume: f64,
+    pub pos: f64,
+    pub track: std::path::PathBuf,
     pub filename: std::path::PathBuf,
 }
 
@@ -28,6 +28,9 @@ impl Config {
         if let Ok(ini) = ini::Ini::load_from_file(&config.filename) {
             if let Some(properties) = ini.section(Some(WINDOW_SECTION)) {
                 read_window_properties(properties, &mut config);
+            }
+            if let Some(properties) = ini.section(Some(TRACK_SECTION)) {
+                read_track_properties(properties, &mut config);
             }
         }
         config
@@ -44,6 +47,10 @@ impl Config {
                 .set(WIDTH_KEY, width.to_string())
                 .set(HEIGHT_KEY, height.to_string())
                 .set(SCALE_KEY, fltk::app::screen_scale(0).to_string());
+            ini.with_section(Some(TRACK_SECTION))
+                .set(VOLUME_KEY, self.volume.to_string())
+                .set(POS_KEY, self.pos.to_string())
+                .set(TRACK_KEY, self.track.to_string_lossy());
             match ini.write_to_file(&self.filename) {
                 Ok(_) => {}
                 Err(err) => self.warning(&format!(
@@ -68,6 +75,9 @@ impl Default for Config {
             window_height: 60,
             window_width: 240,
             window_scale: 1.0,
+            volume: 0.5,
+            pos: 0.0,
+            track: std::path::PathBuf::new(),
             filename: std::path::PathBuf::new(),
         }
     }
@@ -126,9 +136,28 @@ fn read_window_properties(
     }
 }
 
+fn read_track_properties(
+    properties: &ini::Properties,
+    config: &mut Config,
+) {
+    if let Some(value) = properties.get(VOLUME_KEY) {
+        config.volume = util::get_num(value, 0.0, 1.0, config.volume)
+    }
+    if let Some(value) = properties.get(POS_KEY) {
+        config.pos = util::get_num(value, 0.0, f64::MAX, config.pos)
+    }
+    if let Some(value) = properties.get(TRACK_KEY) {
+        config.track = std::path::PathBuf::from(value);
+    }
+}
+
 static WINDOW_SECTION: &str = "Window";
 static X_KEY: &str = "x";
 static Y_KEY: &str = "y";
 static WIDTH_KEY: &str = "width";
 static HEIGHT_KEY: &str = "height";
 static SCALE_KEY: &str = "scale";
+static TRACK_SECTION: &str = "Track";
+static VOLUME_KEY: &str = "volume";
+static POS_KEY: &str = "pos";
+static TRACK_KEY: &str = "track";

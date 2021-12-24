@@ -8,6 +8,7 @@ use crate::fixed::{
 use crate::html_form;
 use crate::mainwindow;
 use crate::options_form;
+use crate::util;
 use fltk::prelude::*;
 
 pub struct Application {
@@ -37,7 +38,7 @@ impl Application {
             800,
         );
         widgets.mainwindow.show();
-        Self {
+        let mut app = Self {
             app,
             helpform: None,
             mainwindow: widgets.mainwindow,
@@ -48,7 +49,16 @@ impl Application {
             time_slider: widgets.time_slider,
             time_label: widgets.time_label,
             receiver,
+        };
+        let load;
+        {
+            let config = CONFIG.get().read().unwrap();
+            load = config.track.exists();
         }
+        if load {
+            app.load_track();
+        }
+        app
     }
 
     pub fn run(&mut self) {
@@ -73,7 +83,20 @@ impl Application {
     }
 
     pub fn on_open(&mut self) {
-        dbg!("on_open"); // TODO
+        // "Audio Files\t*.{oga,ogg,mp3}", FIXME This doesn't work right
+        if let Some(filename) = fltk::dialog::file_chooser(
+            "Choose Track — AMP",
+            "*.{oga,ogg,mp3}",
+            &util::get_track_dir().to_string_lossy(),
+            false,
+        ) {
+            {
+                let mut config = CONFIG.get().write().unwrap();
+                config.track = std::path::PathBuf::from(filename);
+                config.pos = 0.0;
+            }
+            self.load_track();
+        }
     }
 
     fn on_previous(&mut self) {
@@ -136,5 +159,10 @@ impl Application {
             self.mainwindow.height(),
         );
         self.app.quit();
+    }
+
+    fn load_track(&mut self) {
+        let config = CONFIG.get().read().unwrap();
+        dbg!("load_track", &config.track, &config.pos, &config.volume);
     }
 }

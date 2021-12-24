@@ -1,6 +1,7 @@
 // Copyright © 2021 Mark Summerfield. All rights reserved.
 // License: GPLv3
 
+use super::CONFIG;
 use std::{cmp, str};
 
 pub fn x() -> i32 {
@@ -36,4 +37,20 @@ pub fn isclose32(a: f32, b: f32) -> bool {
 
 pub fn isone32(n: f32) -> bool {
     (1.0..=(1.0 + f32::EPSILON)).contains(&n)
+}
+
+pub fn get_track_dir() -> std::path::PathBuf {
+    let config = CONFIG.get().read().unwrap();
+    if config.track.exists() {
+        if let Some(path) = config.track.parent() {
+            return path.to_path_buf();
+        }
+    }
+    if let Some(path) = dirs::audio_dir() {
+        return path;
+    }
+    if let Some(path) = dirs::home_dir() {
+        return path;
+    }
+    std::path::PathBuf::from(".")
 }
