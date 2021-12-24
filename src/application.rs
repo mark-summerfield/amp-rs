@@ -59,6 +59,7 @@ impl Application {
                 (config.volume * 100.0).round()
             ));
         }
+        let mut volume_slider = widgets.volume_slider.clone();
         let mut app = Self {
             app,
             mainwindow: widgets.mainwindow,
@@ -79,6 +80,10 @@ impl Application {
         if load {
             app.load_track();
         }
+        let sender = sender.clone();
+        volume_slider.set_callback(move |_| {
+            sender.send(Action::VolumeUpdate);
+        });
         app
     }
 
@@ -95,6 +100,7 @@ impl Application {
                     Action::Next => self.on_next(),
                     Action::VolumeDown => self.on_volume_down(),
                     Action::VolumeUp => self.on_volume_up(),
+                    Action::VolumeUpdate => self.on_volume_update(),
                     Action::Options => self.on_options(),
                     Action::About => self.on_about(),
                     Action::Help => self.on_help(),
@@ -177,6 +183,13 @@ impl Application {
         let volume = (self.volume_slider.value() as f32 + 0.05).min(1.0);
         self.player.set_volume(self.handle, volume);
         self.volume_slider.set_value(volume as f64);
+        self.volume_label
+            .set_label(&format!("{}%", (volume * 100.0).round()));
+    }
+
+    fn on_volume_update(&mut self) {
+        let volume = self.volume_slider.value() as f32;
+        self.player.set_volume(self.handle, volume);
         self.volume_label
             .set_label(&format!("{}%", (volume * 100.0).round()));
     }

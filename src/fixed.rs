@@ -47,6 +47,7 @@ pub enum Action {
     Next,
     VolumeDown,
     VolumeUp,
+    VolumeUpdate,
     Options,
     About,
     Help,
