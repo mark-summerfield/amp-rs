@@ -1,6 +1,6 @@
 src/main.rs
 src/config.rs
-src/application.rs # TODO play/pause/resume
+src/application.rs
 src/mainwindow.rs
 src/html_form.rs
 src/options_form.rs

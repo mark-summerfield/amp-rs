@@ -28,6 +28,7 @@ pub struct Application {
     wav: soloud::audio::Wav,
     handle: soloud::Handle,
     playing: bool,
+    startup: bool,
     sender: fltk::app::Sender<Action>,
     receiver: fltk::app::Receiver<Action>,
 }
@@ -74,11 +75,12 @@ impl Application {
             wav: soloud::audio::Wav::default(),
             handle: unsafe { soloud::Handle::from_raw(0) },
             playing: false,
+            startup: true,
             sender,
             receiver,
         };
         if load {
-            app.load_track(true);
+            app.load_track();
         }
         #[allow(clippy::clone_on_copy)]
         let sender = sender.clone();
@@ -123,7 +125,7 @@ impl Application {
                 config.track = std::path::PathBuf::from(filename);
                 config.pos = 0.0;
             }
-            self.load_track(false);
+            self.load_track();
         }
     }
 
@@ -136,6 +138,29 @@ impl Application {
     }
 
     fn on_play_or_pause(&mut self) {
+        dbg!(self.startup);
+        if self.startup {
+            let config = CONFIG.get().read().unwrap();
+            let pos = config.pos;
+            // Ignore if we fail
+            if let Ok(_) = self.player.seek(self.handle, pos) {
+                dbg!("A",pos);
+                while self.player.stream_position(self.handle) < pos {
+                    std::thread::sleep(std::time::Duration::from_millis(
+                        100,
+                    ));
+                }
+            }
+            dbg!("B",pos);
+            self.time_slider.set_value(pos);
+            self.time_label.set_label(&format!(
+                "{}″/{}″",
+                pos.round(),
+                self.wav.length().round()
+            ));
+            self.playing = false;
+            self.startup = false;
+        }
         let icon = if self.playing {
             self.player.set_pause(self.handle, true);
             PLAY_ICON
@@ -246,7 +271,7 @@ impl Application {
         }
     }
 
-    fn load_track(&mut self, on_startup: bool) {
+    fn load_track(&mut self) {
         let config = CONFIG.get().read().unwrap();
         let message = match self.wav.load(&config.track) {
             Ok(_) => {
@@ -258,21 +283,13 @@ impl Application {
                 );
                 self.time_slider.set_range(0.0, self.wav.length());
                 self.time_slider.set_step(self.wav.length(), 20);
-                if on_startup {
-                    self.time_slider.set_value(config.pos);
-                    self.time_label.set_label(&format!(
-                        "{}″/{}″",
-                        config.pos.round(),
-                        self.wav.length().round()
-                    ));
-                    // Ignore if we fail
-                    let _ = self.player.seek(self.handle, config.pos);
-                } else {
-                    self.time_label.set_label(&format!(
-                        "0″/{}″",
-                        self.wav.length().round()
-                    ));
-                }
+                let pos = if self.startup { config.pos } else { 0.0 };
+                self.time_slider.set_value(pos);
+                self.time_label.set_label(&format!(
+                    "{}″/{}″",
+                    pos.round(),
+                    self.wav.length().round()
+                ));
                 ON_LOAD.replace("FILE", &config.track.to_string_lossy())
             }
             Err(_) => {
