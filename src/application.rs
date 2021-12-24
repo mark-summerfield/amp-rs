@@ -3,13 +3,15 @@
 
 use super::CONFIG;
 use crate::fixed::{
-    about_html, Action, HELP_HTML, WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
+    about_html, Action, HELP_HTML, LOAD_ERROR, WINDOW_HEIGHT_MIN,
+    WINDOW_WIDTH_MIN,
 };
 use crate::html_form;
 use crate::mainwindow;
 use crate::options_form;
 use crate::util;
 use fltk::prelude::*;
+use soloud::prelude::*;
 
 pub struct Application {
     app: fltk::app::App,
@@ -21,6 +23,9 @@ pub struct Application {
     time_slider: fltk::valuator::HorFillSlider,
     time_label: fltk::frame::Frame,
     helpform: Option<html_form::Form>,
+    player: soloud::Soloud,
+    wav: soloud::audio::Wav,
+    sender: fltk::app::Sender<Action>,
     receiver: fltk::app::Receiver<Action>,
 }
 
@@ -40,7 +45,6 @@ impl Application {
         widgets.mainwindow.show();
         let mut app = Self {
             app,
-            helpform: None,
             mainwindow: widgets.mainwindow,
             play_pause_button: widgets.play_pause_button,
             info_view: widgets.info_view,
@@ -48,6 +52,11 @@ impl Application {
             volume_label: widgets.volume_label,
             time_slider: widgets.time_slider,
             time_label: widgets.time_label,
+            helpform: None,
+            player: soloud::Soloud::default()
+                .expect("Cannot access audio backend"),
+            wav: soloud::audio::Wav::default(),
+            sender,
             receiver,
         };
         let load;
@@ -70,6 +79,7 @@ impl Application {
                     Action::Replay => self.on_replay(),
                     Action::PlayOrPause => self.on_play_or_pause(),
                     Action::SpacePressed => self.on_space_pressed(),
+                    Action::Tick => self.on_tick(),
                     Action::Next => self.on_next(),
                     Action::VolumeDown => self.on_volume_down(),
                     Action::VolumeUp => self.on_volume_up(),
@@ -109,6 +119,13 @@ impl Application {
 
     fn on_play_or_pause(&mut self) {
         dbg!("Play or Pause"); // TODO
+                               /*
+                               self.player.play(&self.wav);
+                               let sender = self.sender.clone();
+                               fltk::app::add_timeout(0.2, move || {
+                                   sender.send(Action::Tick);
+                               });
+                               */
     }
 
     fn on_space_pressed(&mut self) {
@@ -161,8 +178,21 @@ impl Application {
         self.app.quit();
     }
 
+    fn on_tick(&mut self) {
+        dbg!("on_tick");
+        if self.player.voice_count() > 0 {}
+    }
+
     fn load_track(&mut self) {
         let config = CONFIG.get().read().unwrap();
-        dbg!("load_track", &config.track, &config.pos, &config.volume);
+        match self.wav.load(&config.track) {
+            Ok(_) => {
+                dbg!("load_track"); // TODO
+            }
+            Err(_) => self.info_view.set_value(
+                &LOAD_ERROR
+                    .replace("FILE", &config.track.to_string_lossy()),
+            ),
+        }
     }
 }

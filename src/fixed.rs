@@ -42,6 +42,7 @@ pub enum Action {
     Replay,
     PlayOrPause,
     SpacePressed,
+    Tick,
     Next,
     VolumeDown,
     VolumeUp,
@@ -85,6 +86,18 @@ Rust {} • fltk-rs {} • FLTK {} • {}/{}
         env::consts::ARCH
     )
 }
+
+pub static LOAD_ERROR: &str = "
+<font color=red><b>Error</b><br>Failed to open</font>
+<font color=magenta>\"FILE\".</font>
+</body>";
+
+pub static ON_LOAD: &str = "
+<font color=navy><b>TITLE</b></font><br>
+<font color=navy><b>ALBUM</b></font><br>
+<font color=navy><b>ARTIST</b></font><br>
+<font color=navy><b>FILENAME</b></font><br>
+</body>";
 
 // TODO update table with keyboard shortcuts
 pub static HELP_HTML: &str = "<body>
