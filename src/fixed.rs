@@ -34,6 +34,7 @@ pub const BUTTON_HEIGHT: i32 = 30;
 pub const BUTTON_WIDTH: i32 = 70;
 pub const SCALE_MIN: f32 = 0.5;
 pub const SCALE_MAX: f32 = 3.5;
+pub const TICK_TIMEOUT: f64 = 0.1;
 
 #[derive(Copy, Clone, Debug)]
 pub enum Action {
@@ -52,7 +53,7 @@ pub enum Action {
     Quit,
 }
 
-pub fn about_html() -> String {
+pub fn about_html(player: &soloud::Soloud) -> String {
     let year = Local::today().year();
     let year = if year == 2021 {
         format!("{}", year)
@@ -74,7 +75,7 @@ All rights reserved.<br>
 License: GPLv3.</font>
 </center></p>
 <p><center><font size=4 color=#555>
-Rust {} • fltk-rs {} • FLTK {} • {}/{}
+Rust {} • fltk-rs {} • FLTK {}<br>Soloud {}/{} • {}/{}
 </font></center></p>",
         APPNAME,
         VERSION,
@@ -82,6 +83,8 @@ Rust {} • fltk-rs {} • FLTK {} • {}/{}
         rustc_version_runtime::version(),
         fltk::app::crate_version(),
         fltk::app::version_str(),
+        player.version(),
+        player.backend_string(),
         capitalize_first(env::consts::OS),
         env::consts::ARCH
     )
@@ -96,7 +99,7 @@ pub static ON_LOAD: &str = "
 <font color=navy><b>TITLE</b></font><br>
 <font color=navy><b>ALBUM</b></font><br>
 <font color=navy><b>ARTIST</b></font><br>
-<font color=navy><b>FILENAME</b></font><br>
+<font color=navy><b>FILE</b></font><br>
 </body>";
 
 // TODO update table with keyboard shortcuts

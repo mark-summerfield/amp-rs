@@ -3,8 +3,9 @@
 
 use super::CONFIG;
 use crate::fixed::{
-    about_html, Action, HELP_HTML, LOAD_ERROR, WINDOW_HEIGHT_MIN,
-    WINDOW_WIDTH_MIN,
+    about_html, Action, APPNAME, HELP_HTML, LOAD_ERROR, ON_LOAD,
+    PAUSE_ICON, PLAY_ICON, TICK_TIMEOUT, TOOLBUTTON_SIZE,
+    WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
 };
 use crate::html_form;
 use crate::mainwindow;
@@ -25,6 +26,8 @@ pub struct Application {
     helpform: Option<html_form::Form>,
     player: soloud::Soloud,
     wav: soloud::audio::Wav,
+    handle: soloud::Handle,
+    playing: bool,
     sender: fltk::app::Sender<Action>,
     receiver: fltk::app::Receiver<Action>,
 }
@@ -43,6 +46,19 @@ impl Application {
             800,
         );
         widgets.mainwindow.show();
+        let mut player =
+            soloud::Soloud::default().expect("Cannot access audio backend");
+        player.set_pause_all(true);
+        let load;
+        {
+            let config = CONFIG.get().read().unwrap();
+            load = config.track.exists();
+            widgets.volume_slider.set_value(config.volume);
+            widgets.volume_label.set_label(&format!(
+                "{}%",
+                (config.volume * 100.0).round()
+            ));
+        }
         let mut app = Self {
             app,
             mainwindow: widgets.mainwindow,
@@ -53,17 +69,13 @@ impl Application {
             time_slider: widgets.time_slider,
             time_label: widgets.time_label,
             helpform: None,
-            player: soloud::Soloud::default()
-                .expect("Cannot access audio backend"),
+            player,
             wav: soloud::audio::Wav::default(),
+            handle: unsafe { soloud::Handle::from_raw(0) },
+            playing: false,
             sender,
             receiver,
         };
-        let load;
-        {
-            let config = CONFIG.get().read().unwrap();
-            load = config.track.exists();
-        }
         if load {
             app.load_track();
         }
@@ -95,7 +107,7 @@ impl Application {
     pub fn on_open(&mut self) {
         // "Audio Files\t*.{oga,ogg,mp3}", FIXME This doesn't work right
         if let Some(filename) = fltk::dialog::file_chooser(
-            "Choose Track — AMP",
+            &format!("Choose Track — {}", APPNAME),
             "*.{oga,ogg,mp3}",
             &util::get_track_dir().to_string_lossy(),
             false,
@@ -118,14 +130,26 @@ impl Application {
     }
 
     fn on_play_or_pause(&mut self) {
-        dbg!("Play or Pause"); // TODO
-                               /*
-                               self.player.play(&self.wav);
-                               let sender = self.sender.clone();
-                               fltk::app::add_timeout(0.2, move || {
-                                   sender.send(Action::Tick);
-                               });
-                               */
+        let icon = if self.playing {
+            dbg!("PAUSE");
+            self.player.pause(self.handle);
+            PLAY_ICON
+        } else {
+            dbg!("PLAY");
+            self.handle = self.player.play(&self.wav);
+            self.player
+                .set_volume(self.handle, self.volume_slider.value() as f32);
+            #[allow(clippy::clone_on_copy)]
+            let sender = self.sender.clone();
+            fltk::app::add_timeout(TICK_TIMEOUT, move || {
+                sender.send(Action::Tick);
+            });
+            PAUSE_ICON
+        };
+        let mut icon = fltk::image::SvgImage::from_data(icon).unwrap();
+        icon.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
+        self.play_pause_button.set_image(Some(icon));
+        self.playing = !self.playing;
     }
 
     fn on_space_pressed(&mut self) {
@@ -142,11 +166,19 @@ impl Application {
     }
 
     fn on_volume_down(&mut self) {
-        dbg!("on_volume_down"); // TODO
+        let volume = (self.volume_slider.value() as f32 - 0.05).max(0.0);
+        self.player.set_volume(self.handle, volume);
+        self.volume_slider.set_value(volume as f64);
+        self.volume_label
+            .set_label(&format!("{}%", (volume * 100.0).round()));
     }
 
     fn on_volume_up(&mut self) {
-        dbg!("on_volume_up"); // TODO
+        let volume = (self.volume_slider.value() as f32 + 0.05).min(1.0);
+        self.player.set_volume(self.handle, volume);
+        self.volume_slider.set_value(volume as f64);
+        self.volume_label
+            .set_label(&format!("{}%", (volume * 100.0).round()));
     }
 
     fn on_options(&mut self) {
@@ -154,7 +186,14 @@ impl Application {
     }
 
     fn on_about(&mut self) {
-        html_form::Form::new("About", &about_html(), true, 480, 300, false);
+        html_form::Form::new(
+            "About",
+            &about_html(&self.player),
+            true,
+            480,
+            300,
+            false,
+        );
     }
 
     fn on_help(&mut self) {
@@ -168,31 +207,52 @@ impl Application {
     }
 
     fn on_quit(&mut self) {
-        let config = CONFIG.get().read().unwrap();
-        config.save(
-            self.mainwindow.x(),
-            self.mainwindow.y(),
-            self.mainwindow.width(),
-            self.mainwindow.height(),
-        );
+        let mut config = CONFIG.get().write().unwrap();
+        config.window_x = self.mainwindow.x();
+        config.window_y = self.mainwindow.y();
+        config.window_width = self.mainwindow.width();
+        config.window_height = self.mainwindow.height();
+        config.volume = self.volume_slider.value();
+        config.pos = self.time_slider.value();
+        // We already have the track
+        config.save();
         self.app.quit();
     }
 
     fn on_tick(&mut self) {
-        dbg!("on_tick");
-        if self.player.voice_count() > 0 {}
+        if self.playing {
+            self.time_slider
+                .set_value(self.player.stream_time(self.handle));
+            self.time_label.set_label(&format!(
+                "{}″/{}″",
+                self.player.stream_time(self.handle).round(),
+                self.wav.length().round()
+            ));
+            fltk::app::redraw(); // redraws the world
+            #[allow(clippy::clone_on_copy)]
+            let sender = self.sender.clone();
+            fltk::app::add_timeout(TICK_TIMEOUT, move || {
+                sender.send(Action::Tick);
+            });
+        }
     }
 
     fn load_track(&mut self) {
         let config = CONFIG.get().read().unwrap();
-        match self.wav.load(&config.track) {
+        let message = match self.wav.load(&config.track) {
             Ok(_) => {
-                dbg!("load_track"); // TODO
+                self.time_slider.set_range(0.0, self.wav.length());
+                self.time_slider.set_step(self.wav.length(), 20);
+                self.time_label.set_label(&format!(
+                    "0″/{}″",
+                    self.wav.length().round()
+                ));
+                ON_LOAD.replace("FILE", &config.track.to_string_lossy())
             }
-            Err(_) => self.info_view.set_value(
-                &LOAD_ERROR
-                    .replace("FILE", &config.track.to_string_lossy()),
-            ),
-        }
+            Err(_) => {
+                LOAD_ERROR.replace("FILE", &config.track.to_string_lossy())
+            }
+        };
+        self.info_view.set_value(&message);
     }
 }

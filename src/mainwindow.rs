@@ -60,7 +60,7 @@ fn add_info_view() -> fltk::misc::HelpView {
     info_view
         .set_value("<font color=green>Click Open to load a track…</font>");
     info_view.set_text_font(fltk::enums::Font::Helvetica);
-    info_view.set_text_size((info_view.text_size() as f64 * 1.5) as i32);
+    info_view.set_text_size((info_view.text_size() as f64 * 1.3) as i32);
     info_view
 }
 
@@ -183,10 +183,6 @@ fn add_volume_row(
         add_slider_row(width, VOLUME_ICON, "0%");
     volume_slider.set_range(0.0, 1.0);
     volume_slider.set_step(1.0, 10); // 1/10
-    {
-        let config = CONFIG.get().read().unwrap();
-        //volume_slider.set_value(config.volume); / TODO
-    }
     (volume_box, volume_slider, volume_label)
 }
 

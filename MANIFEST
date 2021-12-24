@@ -1,11 +1,11 @@
 src/main.rs
 src/config.rs
-src/application.rs
+src/application.rs # TODO play/pause/resume
 src/mainwindow.rs
 src/html_form.rs
 src/options_form.rs
 src/fixed.rs # VERSION
-src/util.rs
+src/util.rs # TODO humanized_seconds(f64) -> String
 
 Cargo.toml
 

@@ -36,16 +36,16 @@ impl Config {
         config
     }
 
-    pub fn save(&self, x: i32, y: i32, width: i32, height: i32) {
+    pub fn save(&self) {
         if self.filename.to_string_lossy() == "" {
             self.warning("failed to save configuration: no filename");
         } else {
             let mut ini = ini::Ini::new();
             ini.with_section(Some(WINDOW_SECTION))
-                .set(X_KEY, x.to_string())
-                .set(Y_KEY, y.to_string())
-                .set(WIDTH_KEY, width.to_string())
-                .set(HEIGHT_KEY, height.to_string())
+                .set(X_KEY, self.window_x.to_string())
+                .set(Y_KEY, self.window_y.to_string())
+                .set(WIDTH_KEY, self.window_width.to_string())
+                .set(HEIGHT_KEY, self.window_height.to_string())
                 .set(SCALE_KEY, fltk::app::screen_scale(0).to_string());
             ini.with_section(Some(TRACK_SECTION))
                 .set(VOLUME_KEY, self.volume.to_string())
