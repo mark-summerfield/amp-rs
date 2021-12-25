@@ -6,6 +6,7 @@ use crate::fixed::{
     Action, ABOUT_ICON, APPNAME, BUTTON_HEIGHT, HELP_ICON, ICON, LOAD_ICON,
     NEXT_ICON, OPTIONS_ICON, PAD, PLAY_ICON, PREV_ICON, QUIT_ICON,
     REPLAY_ICON, TIME_ICON, TOOLBAR_HEIGHT, TOOLBUTTON_SIZE, VOLUME_ICON,
+    WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
 };
 use crate::util;
 use fltk::prelude::*;
@@ -27,6 +28,7 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
     let mut mainwindow =
         fltk::window::Window::new(x, y, width, height, APPNAME);
     mainwindow.set_icon(Some(icon));
+    mainwindow.size_range(WINDOW_WIDTH_MIN, WINDOW_HEIGHT_MIN, 1024, 800);
     let size = ((TOOLBUTTON_SIZE * 4) / 3) * 6;
     mainwindow.size_range(size, size, size * 4, size * 4);
     mainwindow.make_resizable(true);
@@ -249,17 +251,16 @@ pub fn add_event_handlers(
     });
     mainwindow.handle(move |_, event| {
         if event == fltk::enums::Event::KeyUp {
-            if fltk::app::event_key().bits() == 0x20 {
+            let key = fltk::app::event_key();
+            if key.bits() == 0x20 {
                 sender.send(Action::SpacePressed); // Space → Play or Pause
                 return true;
             }
-            if fltk::app::event_key().bits() == 0x2B
-                || fltk::app::event_key().bits() == 0x3D
-            {
+            if key.bits() == 0x2B || key.bits() == 0x3D {
                 sender.send(Action::VolumeUp); // + or =
                 return true;
             }
-            if fltk::app::event_key().bits() == 0x2D {
+            if key.bits() == 0x2D {
                 sender.send(Action::VolumeDown); // -
                 return true;
             }
@@ -272,4 +273,13 @@ pub fn add_event_handlers(
         }
         false
     });
+}
+
+pub fn update_widgets_from_config(widgets: &mut Widgets) -> bool {
+    let config = CONFIG.get().read().unwrap();
+    widgets.volume_slider.set_value(config.volume);
+    widgets
+        .volume_label
+        .set_label(&format!("{}%", (config.volume * 100.0).round()));
+    config.track.exists()
 }

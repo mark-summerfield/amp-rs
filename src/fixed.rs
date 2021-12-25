@@ -34,6 +34,7 @@ pub const BUTTON_HEIGHT: i32 = 30;
 pub const BUTTON_WIDTH: i32 = 70;
 pub const SCALE_MIN: f32 = 0.5;
 pub const SCALE_MAX: f32 = 3.5;
+pub const TINY_TIMEOUT: f64 = 0.075;
 pub const TICK_TIMEOUT: f64 = 0.1;
 
 #[derive(Copy, Clone, Debug)]

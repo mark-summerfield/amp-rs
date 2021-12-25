@@ -7,6 +7,9 @@ src/options_form.rs
 src/fixed.rs # VERSION
 src/util.rs # TODO humanized_seconds(f64) -> String
 
+# TODO on_position_update() (like on_volume_update())
+# TODO Back; Forward; Help text
+
 Cargo.toml
 
 README.md

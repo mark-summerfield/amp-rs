@@ -23,6 +23,7 @@ impl Form {
             fltk::group::Flex::default().size_of_parent().column();
         vbox.set_margin(PAD);
         vbox.set_pad(PAD);
+        make_config_row();
         let mut spinners = make_spinners();
         let (button_row, mut buttons) = make_buttons();
         vbox.set_size(&button_row, BUTTON_HEIGHT);
@@ -57,13 +58,27 @@ struct Buttons {
 fn make_form() -> fltk::window::Window {
     let image = fltk::image::SvgImage::from_data(ICON).unwrap();
     let mut form = fltk::window::Window::default()
-        .with_size(200, 80)
+        .with_size(WIDTH, HEIGHT)
         .with_label(&format!("Configure — {}", APPNAME));
     if let Some(window) = fltk::app::first_window() {
         form.set_pos(window.x() + 50, window.y() + 100);
     }
     form.set_icon(Some(image));
     form
+}
+
+fn make_config_row() {
+    let mut row = fltk::group::Flex::default().row();
+    let label = fltk::frame::Frame::default()
+        .with_label("Config")
+        .with_align(fltk::enums::Align::Inside | fltk::enums::Align::Left);
+    let config = CONFIG.get().read().unwrap();
+    let mut filename_label = fltk::frame::Frame::default()
+        .with_label(&config.filename.to_string_lossy())
+        .with_align(fltk::enums::Align::Inside | fltk::enums::Align::Left);
+    filename_label.set_frame(fltk::enums::FrameType::EngravedFrame);
+    row.set_size(&label, WIDTH / 6); 
+    row.end();
 }
 
 fn make_spinners() -> Spinners {
@@ -87,7 +102,8 @@ fn make_row(
     maximum: f64,
     step: f64,
 ) -> fltk::misc::Spinner {
-    let row = fltk::group::Flex::default().row();
+    let mut row = fltk::group::Flex::default().row();
+    row.set_pad(PAD);
     let mut label = fltk::button::Button::default()
         .with_label(label)
         .with_align(fltk::enums::Align::Inside | fltk::enums::Align::Left);
@@ -110,6 +126,7 @@ fn make_row(
 
 fn make_buttons() -> (fltk::group::Flex, Buttons) {
     let mut row = fltk::group::Flex::default().size_of_parent().row();
+    row.set_pad(PAD);
     fltk::frame::Frame::default(); // pad left of buttons
     let ok_button = fltk::button::Button::default().with_label("&OK");
     let cancel_button =
@@ -149,3 +166,6 @@ fn add_event_handlers(
         }
     });
 }
+
+const WIDTH: i32 = 340;
+const HEIGHT: i32 = 120;

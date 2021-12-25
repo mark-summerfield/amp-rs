@@ -4,8 +4,7 @@
 use super::CONFIG;
 use crate::fixed::{
     about_html, Action, APPNAME, HELP_HTML, LOAD_ERROR, ON_LOAD,
-    PAUSE_ICON, PLAY_ICON, TICK_TIMEOUT, TOOLBUTTON_SIZE,
-    WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
+    PAUSE_ICON, PLAY_ICON, TICK_TIMEOUT, TINY_TIMEOUT, TOOLBUTTON_SIZE,
 };
 use crate::html_form;
 use crate::mainwindow;
@@ -40,26 +39,11 @@ impl Application {
         let (sender, receiver) = fltk::app::channel::<Action>();
         let mut widgets = mainwindow::make(sender);
         mainwindow::add_event_handlers(&mut widgets.mainwindow, sender);
-        widgets.mainwindow.size_range(
-            WINDOW_WIDTH_MIN,
-            WINDOW_HEIGHT_MIN,
-            1024,
-            800,
-        );
         widgets.mainwindow.show();
         let mut player =
             soloud::Soloud::default().expect("Cannot access audio backend");
         player.set_pause_all(true);
-        let load;
-        {
-            let config = CONFIG.get().read().unwrap();
-            load = config.track.exists();
-            widgets.volume_slider.set_value(config.volume);
-            widgets.volume_label.set_label(&format!(
-                "{}%",
-                (config.volume * 100.0).round()
-            ));
-        }
+        let load = mainwindow::update_widgets_from_config(&mut widgets);
         let mut volume_slider = widgets.volume_slider.clone();
         let mut app = Self {
             app,
@@ -131,35 +115,26 @@ impl Application {
 
     fn on_previous(&mut self) {
         dbg!("Previous"); // TODO
+                          // if let Some(track) = ... prev track if any {
+                          //    self.auto_play_track(track);
+                          // }
     }
 
     fn on_replay(&mut self) {
-        dbg!("Replay"); // TODO
+        if self.playing {
+            self.on_play_or_pause(); // PAUSE
+        }
+        {
+            let mut config = CONFIG.get().write().unwrap();
+            config.pos = 0.0;
+        }
+        self.seek(0.0);
+        self.on_play_or_pause(); // PLAY
     }
 
     fn on_play_or_pause(&mut self) {
-        dbg!(self.startup);
         if self.startup {
-            let config = CONFIG.get().read().unwrap();
-            let pos = config.pos;
-            // Ignore if we fail
-            if let Ok(_) = self.player.seek(self.handle, pos) {
-                dbg!("A",pos);
-                while self.player.stream_position(self.handle) < pos {
-                    std::thread::sleep(std::time::Duration::from_millis(
-                        100,
-                    ));
-                }
-            }
-            dbg!("B",pos);
-            self.time_slider.set_value(pos);
-            self.time_label.set_label(&format!(
-                "{}″/{}″",
-                pos.round(),
-                self.wav.length().round()
-            ));
-            self.playing = false;
-            self.startup = false;
+            self.at_startup();
         }
         let icon = if self.playing {
             self.player.set_pause(self.handle, true);
@@ -168,7 +143,7 @@ impl Application {
             self.player.set_pause(self.handle, false);
             #[allow(clippy::clone_on_copy)]
             let sender = self.sender.clone();
-            fltk::app::add_timeout(TICK_TIMEOUT, move || {
+            fltk::app::add_timeout(TINY_TIMEOUT, move || {
                 sender.send(Action::Tick);
             });
             PAUSE_ICON
@@ -182,7 +157,7 @@ impl Application {
     fn on_space_pressed(&mut self) {
         self.play_pause_button.set_value(true);
         let mut play_pause_button = self.play_pause_button.clone();
-        fltk::app::add_timeout(0.075, move || {
+        fltk::app::add_timeout(TINY_TIMEOUT, move || {
             play_pause_button.set_value(false);
             play_pause_button.do_callback();
         });
@@ -190,22 +165,21 @@ impl Application {
 
     fn on_next(&mut self) {
         dbg!("Next"); // TODO
+                      // if let Some(track) = ... next track if any {
+                      //    self.auto_play_track(track);
+                      // }
     }
 
     fn on_volume_down(&mut self) {
-        let volume = (self.volume_slider.value() as f32 - 0.05).max(0.0);
-        self.player.set_volume(self.handle, volume);
-        self.volume_slider.set_value(volume as f64);
-        self.volume_label
-            .set_label(&format!("{}%", (volume * 100.0).round()));
+        self.change_volume(
+            (self.volume_slider.value() as f32 - 0.05).max(0.0),
+        );
     }
 
     fn on_volume_up(&mut self) {
-        let volume = (self.volume_slider.value() as f32 + 0.05).min(1.0);
-        self.player.set_volume(self.handle, volume);
-        self.volume_slider.set_value(volume as f64);
-        self.volume_label
-            .set_label(&format!("{}%", (volume * 100.0).round()));
+        self.change_volume(
+            (self.volume_slider.value() as f32 + 0.05).min(1.0),
+        );
     }
 
     fn on_volume_update(&mut self) {
@@ -213,6 +187,7 @@ impl Application {
         self.player.set_volume(self.handle, volume);
         self.volume_label
             .set_label(&format!("{}%", (volume * 100.0).round()));
+        fltk::app::redraw(); // redraws the world
     }
 
     fn on_options(&mut self) {
@@ -255,12 +230,18 @@ impl Application {
 
     fn on_tick(&mut self) {
         if self.playing {
-            self.time_slider
-                .set_value(self.player.stream_time(self.handle));
+            let pos = self.player.stream_position(self.handle);
+            let length = self.wav.length();
+            if self.player.voice_count() <= 0 {
+                // Reached the end
+                self.on_next();
+                return;
+            }
+            self.time_slider.set_value(pos);
             self.time_label.set_label(&format!(
                 "{}″/{}″",
-                self.player.stream_time(self.handle).round(),
-                self.wav.length().round()
+                pos.round(),
+                length.round()
             ));
             fltk::app::redraw(); // redraws the world
             #[allow(clippy::clone_on_copy)]
@@ -271,7 +252,21 @@ impl Application {
         }
     }
 
+    fn at_startup(&mut self) {
+        let pos = {
+            let config = CONFIG.get().read().unwrap();
+            config.pos
+        };
+        self.seek(pos);
+        self.playing = false;
+        self.startup = false;
+    }
+
     fn load_track(&mut self) {
+        if self.playing {
+            self.on_play_or_pause(); // PAUSE
+            self.player.stop_all();
+        }
         let config = CONFIG.get().read().unwrap();
         let message = match self.wav.load(&config.track) {
             Ok(_) => {
@@ -297,5 +292,39 @@ impl Application {
             }
         };
         self.info_view.set_value(&message);
+    }
+
+    fn change_volume(&mut self, volume: f32) {
+        self.player.set_volume(self.handle, volume);
+        self.volume_slider.set_value(volume as f64);
+        self.volume_label
+            .set_label(&format!("{}%", (volume * 100.0).round()));
+        fltk::app::redraw(); // redraws the world
+    }
+
+    fn auto_play_track(&mut self, track: std::path::PathBuf) {
+        if self.playing {
+            self.on_play_or_pause(); // PAUSE
+        }
+        {
+            let mut config = CONFIG.get().write().unwrap();
+            config.track = track;
+        }
+        self.load_track();
+        self.on_play_or_pause(); // PLAY
+    }
+
+    fn seek(&mut self, pos: f64) {
+        if self.player.seek(self.handle, pos).is_ok() {
+            while self.player.stream_position(self.handle) < pos {
+                std::thread::sleep(std::time::Duration::from_millis(100));
+            }
+        }
+        self.time_slider.set_value(pos);
+        self.time_label.set_label(&format!(
+            "{}″/{}″",
+            pos.round(),
+            self.wav.length().round()
+        ));
     }
 }
