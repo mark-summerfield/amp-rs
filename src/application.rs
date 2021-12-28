@@ -3,8 +3,8 @@
 
 use super::CONFIG;
 use crate::fixed::{
-    about_html, Action, APPNAME, HELP_HTML, LOAD_ERROR, ON_LOAD,
-    PAUSE_ICON, PLAY_ICON, TICK_TIMEOUT, TINY_TIMEOUT, TOOLBUTTON_SIZE,
+    about_html, Action, APPNAME, HELP_HTML, LOAD_ERROR, PAUSE_ICON,
+    PLAY_ICON, TICK_TIMEOUT, TINY_TIMEOUT, TOOLBUTTON_SIZE,
 };
 use crate::html_form;
 use crate::mainwindow;
@@ -285,13 +285,14 @@ impl Application {
                     pos.round(),
                     self.wav.length().round()
                 ));
-                ON_LOAD.replace("FILE", &config.track.to_string_lossy())
+                util::get_track_data_html(&config.track)
             }
             Err(_) => {
                 LOAD_ERROR.replace("FILE", &config.track.to_string_lossy())
             }
         };
         self.info_view.set_value(&message);
+        fltk::app::redraw(); // redraws the world
     }
 
     fn change_volume(&mut self, volume: f32) {

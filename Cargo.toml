@@ -23,6 +23,7 @@ codegen-units = 1
 chrono = "^0.4"
 dirs = "^4"
 fltk = { version = "^1.2", features = ["no-pango",], git = "https://github.com/fltk-rs/fltk-rs" }
+lofty = "^0.3"
 num = "^0.4"
 rust-ini = "^0.17"
 rustc_version_runtime = "^0.2"

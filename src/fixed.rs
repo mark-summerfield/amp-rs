@@ -97,13 +97,6 @@ pub static LOAD_ERROR: &str = "
 <font color=magenta>\"FILE\".</font>
 </body>";
 
-pub static ON_LOAD: &str = "
-<font color=navy><b>TITLE</b></font><br>
-<font color=navy><b>ALBUM</b></font><br>
-<font color=navy><b>ARTIST</b></font><br>
-<font color=navy><b>FILE</b></font><br>
-</body>";
-
 // TODO update table with keyboard shortcuts
 pub static HELP_HTML: &str = "<body>
 <p><center><font color=navy size=6><b>AMP</b></font></center></p>

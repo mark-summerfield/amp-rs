@@ -2,7 +2,15 @@
 // License: GPLv3
 
 use super::CONFIG;
+use lofty::{self, Accessor, ItemKey};
 use std::{cmp, str};
+
+pub struct TrackData {
+    pub title: String,
+    pub album: String,
+    pub artist: String,
+    pub number: i32,
+}
 
 pub fn x() -> i32 {
     (fltk::app::screen_size().0 / 2.0) as i32
@@ -53,4 +61,96 @@ pub fn get_track_dir() -> std::path::PathBuf {
         return path;
     }
     std::path::PathBuf::from(".")
+}
+
+pub fn get_track_data_html(track: &std::path::PathBuf) -> String {
+    let name = if let Some(name) = track.file_stem() {
+        name.to_string_lossy()
+    } else {
+        track.to_string_lossy()
+    };
+    let name = name.replace("_", " ").replace("-", " ");
+    match get_track_tag(&track) {
+        Ok(Some(data)) => {
+            let mut text = String::from("<font color=navy><b>");
+            if !data.title.is_empty() {
+                text.push_str(&data.title);
+            } else {
+                text.push_str(&name);
+            }
+            text.push_str("</b></font><br>");
+            if !data.album.is_empty() {
+                text.push_str("<font color=green>");
+                text.push_str(&data.album);
+                text.push_str("</font>");
+            }
+            if data.number > 0 {
+                text.push_str("<font color=green>");
+                text.push_str(&format!(" (#{})", data.number));
+                text.push_str("</font>");
+            }
+            if !data.album.is_empty() || data.number > 0 {
+                text.push_str("<br>");
+            }
+            if !data.album.is_empty() {
+                text.push_str("<font color=green>");
+                text.push_str(&data.artist);
+                text.push_str("</font><br>");
+            }
+            text.push_str("<font color=#008B8B>");
+            text.push_str(&track.to_string_lossy());
+            text.push_str("</font>");
+            text
+        }
+        _ => {
+            format!(
+                "<font color=navy><b>{}</b></font><br>
+                <font color=#008B8B>{}</font>",
+                name,
+                track.to_string_lossy()
+            )
+        }
+    }
+}
+
+fn get_track_tag(
+    track: &std::path::PathBuf,
+) -> lofty::Result<Option<TrackData>> {
+    let tags = lofty::Probe::open(track)?.guess_file_type()?.read(false)?;
+    if let Some(tag) = tags.primary_tag() {
+        Ok(Some(TrackData {
+            title: if let Some(title) = tag.title() {
+                title.to_owned()
+            } else {
+                String::new()
+            },
+            album: if let Some(album) = tag.album() {
+                album.to_owned()
+            } else {
+                String::new()
+            },
+            artist: if let Some(artist) = tag.artist() {
+                artist.to_owned()
+            } else {
+                String::new()
+            },
+            number: if let Some(num_item) =
+                tag.get_item_ref(&ItemKey::TrackNumber)
+            {
+                match num_item.value() {
+                    lofty::ItemValue::Text(text) => {
+                        match text.parse::<i32>() {
+                            Ok(n) => n,
+                            _ => 0,
+                        }
+                    }
+                    _ => 0,
+                }
+            } else {
+                0
+            },
+        }))
+    } else {
+        Ok(None)
+    }
 }
