@@ -109,8 +109,8 @@ fn add_toolbar(
     );
     add_toolbutton(
         sender,
-        'f',
-        "Forward to next track • f",
+        'n',
+        "Next track • n",
         Action::Next,
         NEXT_ICON,
         &mut button_box,
@@ -211,7 +211,7 @@ fn add_slider_row(
     let mut label = fltk::frame::Frame::default().with_label(label);
     label.set_frame(fltk::enums::FrameType::EngravedFrame);
     row.set_size(&icon_label, icon_width);
-    row.set_size(&label, icon_width * 2);
+    row.set_size(&label, icon_width * 3);
     row.end();
     (row, slider, label)
 }

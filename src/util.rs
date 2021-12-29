@@ -208,7 +208,7 @@ pub fn get_prev_or_next_track(
     track: &std::path::Path,
     which: WhichTrack,
 ) -> Option<std::path::PathBuf> {
-    let tracks = get_sorted_tracks(&track);
+    let tracks = get_sorted_tracks(track);
     if let Ok(index) = tracks.binary_search(&track.to_path_buf()) {
         match which {
             WhichTrack::Previous => {
