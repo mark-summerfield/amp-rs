@@ -121,10 +121,15 @@ impl Application {
     }
 
     fn on_previous(&mut self) {
-        dbg!("Previous"); // TODO
-                          // if let Some(track) = ... prev track if any {
-                          //    self.auto_play_track(track);
-                          // }
+        let track = {
+            let config = CONFIG.get().read().unwrap();
+            config.track.clone()
+        };
+        if let Some(track) =
+            util::get_prev_or_next_track(&track, util::WhichTrack::Previous)
+        {
+            self.auto_play_track(track);
+        }
     }
 
     fn on_replay(&mut self) {
@@ -175,8 +180,10 @@ impl Application {
             let config = CONFIG.get().read().unwrap();
             config.track.clone()
         };
-        if let Some(track) = util::get_prev_or_next_track(&track, true) {
-            dbg!("next", &track);
+        if let Some(track) =
+            util::get_prev_or_next_track(&track, util::WhichTrack::Next)
+        {
+            self.auto_play_track(track);
         }
     }
 

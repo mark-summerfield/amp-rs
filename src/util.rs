@@ -199,43 +199,60 @@ fn get_track_tag(
     }
 }
 
-// (*.{flac,mogg,mp3,oga,ogg,wav})",
+pub enum WhichTrack {
+    Previous,
+    Next,
+}
+
 pub fn get_prev_or_next_track(
     track: &std::path::Path,
-    want_next: bool,
+    which: WhichTrack,
 ) -> Option<std::path::PathBuf> {
-    let suffixes = vec![
-        String::from(".flac"),
-        String::from(".mogg"),
-        String::from(".mp3"),
-        String::from(".oga"),
-        String::from(".ogg"),
-        String::from(".wav"),
-    ];
-    let dir = track.parent();
-    if dir.is_none() {
-        return None;
-    }
-    let dir = dir.unwrap();
-    let walker = dir.read_dir();
-    if walker.is_err() {
-        return None;
-    }
-    let walker = walker.unwrap();
-    //let mut tracks = vec![];
-    for entry in walker {
-        if let Ok(entry) = entry {
-            if let Ok(filename) = entry.file_name().into_string() {
-                let filename = filename.to_lowercase();
-                dbg!(&filename);
-                //for suffix in &suffixes {
-                //    if filename.ends_with(&suffix) {
-                //        tracks.push(filename);
-                //    }
-                //}
+    let tracks = get_sorted_tracks(&track);
+    if let Ok(index) = tracks.binary_search(&track.to_path_buf()) {
+        match which {
+            WhichTrack::Previous => {
+                if index > 0 {
+                    return Some(tracks[index - 1].clone());
+                }
+            }
+            WhichTrack::Next => {
+                if index + 1 < tracks.len() {
+                    return Some(tracks[index + 1].clone());
+                }
             }
         }
     }
-    //dbg!(tracks);
-    None // TODO should return Some(found track)
+    None
+}
+
+fn get_sorted_tracks(track: &std::path::Path) -> Vec<std::path::PathBuf> {
+    let mut tracks = vec![];
+    let suffixes = vec!["flac", "mogg", "mp3", "oga", "ogg", "wav"];
+    if let Some(dir) = track.parent() {
+        if let Ok(walker) = dir.read_dir() {
+            #[allow(clippy::manual_flatten)]
+            for entry in walker {
+                if let Ok(entry) = entry {
+                    if let Ok(kind) = entry.file_type() {
+                        if !kind.is_file() {
+                            continue;
+                        }
+                    }
+                    let path = entry.path();
+                    if let Some(extension) = path.extension() {
+                        let extension = extension.to_string_lossy();
+                        for suffix in &suffixes {
+                            if *suffix == extension {
+                                tracks.push(path);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            tracks.sort();
+        }
+    }
+    tracks
 }

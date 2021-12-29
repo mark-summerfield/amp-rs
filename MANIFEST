@@ -5,9 +5,9 @@ src/mainwindow.rs
 src/html_form.rs
 src/options_form.rs
 src/fixed.rs # VERSION
-src/util.rs # TODO ##################
+src/util.rs
 
-# TODO Back; Forward; Help text
+# TODO Help text
 
 Cargo.toml
 
