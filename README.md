@@ -1,8 +1,10 @@
 # AMP
 
-“Another Music Player” is written in Rust/FLTK.
+“Another Music Player” provides a basic but useful example of Rust/FLTK and
+the Soloud sound library.
 
-*Warning: Work in Progress*
+It should be especially handy for audio books since at startup it restores
+the last played track at the exact position it had reached.
 
 Tested on Linux and Windows.
 

@@ -239,9 +239,9 @@ impl Application {
             }
             self.time_slider.set_value(pos);
             self.time_label.set_label(&format!(
-                "{}″/{}″",
-                pos.round(),
-                length.round()
+                "{}/{}",
+                util::humanized_time(pos),
+                util::humanized_time(length)
             ));
             fltk::app::redraw(); // redraws the world
             #[allow(clippy::clone_on_copy)]
@@ -281,9 +281,9 @@ impl Application {
                 let pos = if self.startup { config.pos } else { 0.0 };
                 self.time_slider.set_value(pos);
                 self.time_label.set_label(&format!(
-                    "{}″/{}″",
-                    pos.round(),
-                    self.wav.length().round()
+                    "{}/{}",
+                    util::humanized_time(pos),
+                    util::humanized_time(self.wav.length())
                 ));
                 util::get_track_data_html(&config.track)
             }
@@ -323,9 +323,9 @@ impl Application {
         }
         self.time_slider.set_value(pos);
         self.time_label.set_label(&format!(
-            "{}″/{}″",
-            pos.round(),
-            self.wav.length().round()
+            "{}/{}",
+            util::humanized_time(pos),
+            util::humanized_time(self.wav.length())
         ));
     }
 }

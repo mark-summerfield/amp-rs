@@ -5,13 +5,6 @@ use super::CONFIG;
 use lofty::{self, Accessor, ItemKey};
 use std::{cmp, str};
 
-pub struct TrackData {
-    pub title: String,
-    pub album: String,
-    pub artist: String,
-    pub number: i32,
-}
-
 pub fn x() -> i32 {
     (fltk::app::screen_size().0 / 2.0) as i32
 }
@@ -39,6 +32,10 @@ where
     }
 }
 
+pub fn isclose64(a: f64, b: f64) -> bool {
+    (a..=(a + f64::EPSILON)).contains(&b)
+}
+
 pub fn isclose32(a: f32, b: f32) -> bool {
     (a..=(a + f32::EPSILON)).contains(&b)
 }
@@ -61,6 +58,38 @@ pub fn get_track_dir() -> std::path::PathBuf {
         return path;
     }
     std::path::PathBuf::from(".")
+}
+
+pub fn humanized_time(secs: f64) -> String {
+    const HR_SIGN: char = 'h';
+    const MIN_SIGN: char = '′';
+    const SEC_SIGN: char = '″';
+    if secs <= 0.0 {
+        return format!("0{}", SEC_SIGN);
+    }
+    let hrs = secs / 3600.0;
+    let hours = if hrs >= 1.0 {
+        format!("{:.0}{}", hrs, HR_SIGN)
+    } else {
+        String::new()
+    };
+    let secs = secs % 3600.0;
+    let mins = secs / 60.0;
+    let secs = secs % 60.0;
+    let minutes = if mins >= 1.0 {
+        format!("{:.0}{}", mins, MIN_SIGN)
+    } else {
+        String::new()
+    };
+    if !hours.is_empty() {
+        format!("{}{}", hours, minutes)
+    } else if mins > 30.0 || (mins >= 1.0 && isclose64(secs, 0.0)) {
+        minutes
+    } else if mins >= 1.0 {
+        format!("{}{:.0}{}", minutes, secs, SEC_SIGN)
+    } else {
+        format!("{:.0}{}", secs.max(1.0), SEC_SIGN)
+    }
 }
 
 pub fn get_track_data_html(track: &std::path::PathBuf) -> String {
@@ -111,6 +140,13 @@ pub fn get_track_data_html(track: &std::path::PathBuf) -> String {
             )
         }
     }
+}
+
+pub struct TrackData {
+    pub title: String,
+    pub album: String,
+    pub artist: String,
+    pub number: i32,
 }
 
 fn get_track_tag(
