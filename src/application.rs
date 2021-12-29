@@ -107,7 +107,7 @@ impl Application {
     pub fn on_open(&mut self) {
         if let Some(filename) = fltk::dialog::file_chooser(
             &format!("Choose Track — {}", APPNAME),
-            "Audio Files (*.{oga,ogg,mp3})",
+            "Audio Files (*.{flac,mogg,mp3,oga,ogg,wav})",
             &util::get_track_dir(),
             false,
         ) {
@@ -171,10 +171,13 @@ impl Application {
     }
 
     fn on_next(&mut self) {
-        dbg!("Next"); // TODO
-                      // if let Some(track) = ... next track if any {
-                      //    self.auto_play_track(track);
-                      // }
+        let track = {
+            let config = CONFIG.get().read().unwrap();
+            config.track.clone()
+        };
+        if let Some(track) = util::get_prev_or_next_track(&track, true) {
+            dbg!("next", &track);
+        }
     }
 
     fn on_volume_down(&mut self) {
