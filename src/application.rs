@@ -244,7 +244,7 @@ impl Application {
         if self.playing {
             let pos = self.player.stream_position(self.handle);
             let length = self.wav.length();
-            if self.player.voice_count() <= 0 {
+            if self.player.voice_count() == 0 {
                 // Reached the end
                 self.on_next();
                 return;
@@ -339,5 +339,6 @@ impl Application {
             util::humanized_time(pos),
             util::humanized_time(self.wav.length())
         ));
+        fltk::app::redraw(); // redraws the world
     }
 }

@@ -32,10 +32,6 @@ where
     }
 }
 
-pub fn isclose64(a: f64, b: f64) -> bool {
-    (a..=(a + f64::EPSILON)).contains(&b)
-}
-
 pub fn isclose32(a: f32, b: f32) -> bool {
     (a..=(a + f32::EPSILON)).contains(&b)
 }
@@ -67,39 +63,51 @@ pub fn humanized_time(secs: f64) -> String {
     if secs <= 0.0 {
         return format!("0{}", SEC_SIGN);
     }
-    let hrs = secs / 3600.0;
-    let hours = if hrs >= 1.0 {
-        format!("{:.0}{}", hrs, HR_SIGN)
+    let hrs = (secs / 3600.0).floor();
+    let mut secs = secs % 3600.0;
+    let mut mins = (secs / 60.0).floor();
+    secs %= 60.0;
+    let mut hours = format!("{:.0}", hrs);
+    let mut minutes = format!("{:.0}", mins);
+    if minutes == "60" {
+        hours = format!("{:.0}", hrs + 1.0);
+        mins = 0.0;
+    }
+    let mut seconds = format!("{:.0}", secs);
+    if seconds == "60" {
+        minutes = format!("{:.0}", mins + 1.0);
+        seconds.clear();
+    }
+    if hours == "0" || hours.is_empty() {
+        hours.clear();
     } else {
-        String::new()
-    };
-    let secs = secs % 3600.0;
-    let mins = secs / 60.0;
-    let secs = secs % 60.0;
-    let minutes = if mins >= 1.0 {
-        format!("{:.0}{}", mins, MIN_SIGN)
+        hours.push(HR_SIGN);
+    }
+    if minutes == "0" || minutes.is_empty() {
+        minutes.clear();
     } else {
-        String::new()
-    };
-    if !hours.is_empty() {
-        format!("{}{}", hours, minutes)
-    } else if mins > 30.0 || (mins >= 1.0 && isclose64(secs, 0.0)) {
-        minutes
-    } else if mins >= 1.0 {
-        format!("{}{:.0}{}", minutes, secs, SEC_SIGN)
+        minutes.push(MIN_SIGN);
+    }
+    if seconds == "0" || seconds.is_empty() {
+        seconds.clear();
     } else {
-        format!("{:.0}{}", secs.max(1.0), SEC_SIGN)
+        seconds.push(SEC_SIGN);
+    }
+    if hours.is_empty() && minutes.is_empty() && seconds.is_empty() {
+        format!("0{}", SEC_SIGN)
+    } else {
+        format!("{}{}{}", hours, minutes, seconds)
     }
 }
 
-pub fn get_track_data_html(track: &std::path::PathBuf) -> String {
+pub fn get_track_data_html(track: &std::path::Path) -> String {
     let name = if let Some(name) = track.file_stem() {
         name.to_string_lossy()
     } else {
         track.to_string_lossy()
     };
     let name = name.replace("_", " ").replace("-", " ");
-    match get_track_tag(&track) {
+    match get_track_tag(track) {
         Ok(Some(data)) => {
             let mut text = String::from("<font color=navy><b>");
             if !data.title.is_empty() {
@@ -150,7 +158,7 @@ pub struct TrackData {
 }
 
 fn get_track_tag(
-    track: &std::path::PathBuf,
+    track: &std::path::Path,
 ) -> lofty::Result<Option<TrackData>> {
     let tags = lofty::Probe::open(track)?.guess_file_type()?.read(false)?;
     if let Some(tag) = tags.primary_tag() {
