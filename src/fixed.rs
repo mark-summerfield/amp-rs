@@ -49,6 +49,7 @@ pub enum Action {
     VolumeDown,
     VolumeUp,
     VolumeUpdate,
+    TimeUpdate,
     Options,
     About,
     Help,

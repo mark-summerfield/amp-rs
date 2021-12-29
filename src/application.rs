@@ -45,6 +45,7 @@ impl Application {
         player.set_pause_all(true);
         let load = mainwindow::update_widgets_from_config(&mut widgets);
         let mut volume_slider = widgets.volume_slider.clone();
+        let mut time_slider = widgets.time_slider.clone();
         let mut app = Self {
             app,
             mainwindow: widgets.mainwindow,
@@ -71,6 +72,11 @@ impl Application {
         volume_slider.set_callback(move |_| {
             sender.send(Action::VolumeUpdate);
         });
+        #[allow(clippy::clone_on_copy)]
+        let sender = sender.clone();
+        time_slider.set_callback(move |_| {
+            sender.send(Action::TimeUpdate);
+        });
         app
     }
 
@@ -88,6 +94,7 @@ impl Application {
                     Action::VolumeDown => self.on_volume_down(),
                     Action::VolumeUp => self.on_volume_up(),
                     Action::VolumeUpdate => self.on_volume_update(),
+                    Action::TimeUpdate => self.on_time_update(),
                     Action::Options => self.on_options(),
                     Action::About => self.on_about(),
                     Action::Help => self.on_help(),
@@ -187,6 +194,11 @@ impl Application {
         self.player.set_volume(self.handle, volume);
         self.volume_label
             .set_label(&format!("{}%", (volume * 100.0).round()));
+        fltk::app::redraw(); // redraws the world
+    }
+
+    fn on_time_update(&mut self) {
+        self.seek(self.time_slider.value());
         fltk::app::redraw(); // redraws the world
     }
 
