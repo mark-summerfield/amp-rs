@@ -8,8 +8,8 @@ include = [ "Cargo.toml", "src/**/*.rs", "images/*",]
 description = "AMP (Another Music Player)"
 homepage = "https://github.com/mark-summerfield/amp-rs"
 readme = "README.md"
-keywords = [ "fltk",]
-categories = []
+keywords = [ "fltk", "audio", "music", "player", "gui"]
+categories = ["multimedia::audio"]
 license = "GPL-3.0"
 
 [dependencies]
