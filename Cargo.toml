@@ -34,4 +34,5 @@ features = [ "no-pango",]
 git = "https://github.com/fltk-rs/fltk-rs"
 
 [dependencies.soloud]
+version = "^1"
 git = "https://github.com/moalyousef/soloud-rs"
