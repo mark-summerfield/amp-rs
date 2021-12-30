@@ -69,7 +69,7 @@ pub fn about_html(player: &soloud::Soloud) -> String {
 <p><center><font color=navy size=5>“Another Music Player‟</font>
 </center></p>
 <p><center><font size=4>
-<a href=\"http://www.qtrac.eu/amp.html\">www.qtrac.eu/amp.html</a>
+<a href=\"https://github.com/mark-summerfield/amp-rs\">https://github.com/mark-summerfield/amp-rs</a>
 </font></center></p>
 <p><center>
 <font size=4 color=green>
