@@ -6,7 +6,7 @@ use chrono::prelude::*;
 use std::env;
 
 pub static APPNAME: &str = "AMP";
-pub static VERSION: &str = "0.1.0";
+pub static VERSION: &str = "1.0.0";
 pub const ICON: &str = include_str!("../images/amp.svg");
 pub const LOAD_ICON: &str = include_str!("../images/document-open.svg");
 pub const PREV_ICON: &str =
@@ -98,25 +98,39 @@ pub static LOAD_ERROR: &str = "
 <font color=magenta>\"FILE\".</font>
 </body>";
 
-// TODO update table with keyboard shortcuts
 pub static HELP_HTML: &str = "<body>
 <p><center><font color=navy size=6><b>AMP</b></font></center></p>
 <p><center><font color=blue size=5>“Another Music Player‟</font>
 </center></p>
+<font color=blue>
+<p>
+Another Music Player provides a basic but useful example of Rust/FLTK and
+the Soloud sound library.
+</p>
+<p>
+It should be especially handy for audio books since at startup it restores
+the last played track at the exact position it had reached.
+</p>
+<p>
+Click the volume slider to change the volume (or press the <b>+</b> or
+<b>-</b> keys). Similarly, click the time slider to change the position in the currently playing track.
+</p>
+</font>
 <p>
 <table border=1 align=center>
-<font color=blue>
+<font color=green>
 <tr><th>Key</th><th>Action</th></tr>
-<tr><td><b>a</b></td><td>Show About box</td></tr>
+<tr><td><b>-</b></td><td>Reduce the volume</td></tr>
+<tr><td><b>+</b> or <b>=</b></td><td>Increase the volume</td></tr>
+<tr><td><b>a</b></td><td>Show the About box</td></tr>
+<tr><td><b>b</b></td><td>Go <i>B</i>ack to the previous track</td></tr>
+<tr><td><b>c</b></td><td>Configure…</td></tr>
 <tr><td><b>h</b> or <b>F1</b></td><td>Show this Help window</td></tr>
-<tr><td><b>n</b></td><td>New Game</td></tr>
-<tr><td><b>o</b></td><td>View or Edit Options</td></tr>
+<tr><td><b>n</b></td><td>Go to the <i>N</i>ext track</td></tr>
+<tr><td><b>o</b></td><td>Open a track ready to play</td></tr>
+<tr><td><b>p</b> or <b>Space</b></td><td>Play or Pause the current
+track</td></tr>
 <tr><td><b>q</b> or <b>Esc</b></td><td>Quit</td></tr>
-<tr><td><b>←</b></td><td>Move the focus left</td></tr>
-<tr><td><b>→</b></td><td>Move the focus right</td></tr>
-<tr><td><b>↑</b></td><td>Move the focus up</td></tr>
-<tr><td><b>↓</b></td><td>Move the focus down</td></tr>
-<tr><td><b>Space</b></td><td>Click the focused tile</td></tr>
 </font>
 </table>
 </body>";

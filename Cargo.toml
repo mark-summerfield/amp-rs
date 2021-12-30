@@ -1,31 +1,36 @@
 [package]
 name = "amp"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
-publish = false # TODO
+publish = false
 authors = [ "Mark Summerfield <mark@qtrac.eu>",]
 include = [ "Cargo.toml", "src/**/*.rs", "images/*",]
 description = "AMP (Another Music Player)"
-homepage = "https://github.com/mark-summerfield/amp-rs" # TODO
+homepage = "https://github.com/mark-summerfield/amp-rs"
 readme = "README.md"
-keywords = [ "fltk"]
-categories = [ ]
+keywords = [ "fltk",]
+categories = []
 license = "GPL-3.0"
+
+[dependencies]
+chrono = "^0.4"
+dirs = "^4"
+lofty = "^0.3"
+num = "^0.4"
+rust-ini = "^0.17"
+rustc_version_runtime = "^0.2"
+state = "^0.5"
 
 [badges.maintenance]
 status = "passively-maintained"
 
 [profile.release]
 codegen-units = 1
-# lto = "fat" # TODO
 
-[dependencies]
-chrono = "^0.4"
-dirs = "^4"
-fltk = { version = "^1.2", features = ["no-pango",], git = "https://github.com/fltk-rs/fltk-rs" }
-lofty = "^0.3"
-num = "^0.4"
-rust-ini = "^0.17"
-rustc_version_runtime = "^0.2"
-soloud = { git = "https://github.com/moalyousef/soloud-rs" }
-state = "^0.5"
+[dependencies.fltk]
+version = "^1.2"
+features = [ "no-pango",]
+git = "https://github.com/fltk-rs/fltk-rs"
+
+[dependencies.soloud]
+git = "https://github.com/moalyousef/soloud-rs"

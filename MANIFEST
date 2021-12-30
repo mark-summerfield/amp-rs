@@ -7,8 +7,6 @@ src/options_form.rs
 src/fixed.rs # VERSION
 src/util.rs
 
-# TODO Help text
-
 Cargo.toml
 
 README.md
