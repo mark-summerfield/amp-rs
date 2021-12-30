@@ -30,7 +30,12 @@ impl Form {
         vbox.end();
         form.end();
         form.make_modal(true);
-        add_event_handlers(&mut form, &spinners, &mut buttons, ok.clone());
+        add_event_handlers(
+            &mut form,
+            &spinners,
+            &mut buttons,
+            Rc::clone(&ok),
+        );
         spinners.scale_spinner.take_focus().unwrap();
         form.show();
         while form.shown() {
@@ -77,7 +82,7 @@ fn make_config_row() {
         .with_label(&config.filename.to_string_lossy())
         .with_align(fltk::enums::Align::Inside | fltk::enums::Align::Left);
     filename_label.set_frame(fltk::enums::FrameType::EngravedFrame);
-    row.set_size(&label, WIDTH / 6); 
+    row.set_size(&label, WIDTH / 6);
     row.end();
 }
 

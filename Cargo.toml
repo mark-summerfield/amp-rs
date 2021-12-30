@@ -1,6 +1,6 @@
 [package]
 name = "amp-rs"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 publish = true
 authors = [ "Mark Summerfield <mark@qtrac.eu>",]
@@ -8,8 +8,8 @@ include = [ "Cargo.toml", "src/**/*.rs", "images/*",]
 description = "AMP (Another Music Player)"
 homepage = "https://github.com/mark-summerfield/amp-rs"
 readme = "README.md"
-keywords = [ "fltk", "audio", "music", "player", "gui"]
-categories = ["multimedia::audio"]
+keywords = [ "fltk", "audio", "music", "player", "gui",]
+categories = [ "multimedia::audio",]
 license = "GPL-3.0"
 
 [dependencies]
@@ -21,13 +21,6 @@ rust-ini = "^0.17"
 rustc_version_runtime = "^0.2"
 state = "^0.5"
 
-[badges.maintenance]
-status = "passively-maintained"
-
-[profile.release]
-codegen-units = 1
-lto = "fat"
-
 [dependencies.fltk]
 version = "^1.2"
 features = [ "no-pango",]
@@ -36,3 +29,10 @@ git = "https://github.com/fltk-rs/fltk-rs"
 [dependencies.soloud]
 version = "^1"
 git = "https://github.com/moalyousef/soloud-rs"
+
+[badges.maintenance]
+status = "passively-maintained"
+
+[profile.release]
+codegen-units = 1
+lto = "fat"

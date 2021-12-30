@@ -6,7 +6,7 @@ use chrono::prelude::*;
 use std::env;
 
 pub static APPNAME: &str = "AMP";
-pub static VERSION: &str = "1.0.0";
+pub static VERSION: &str = "1.0.1";
 pub const ICON: &str = include_str!("../images/amp.svg");
 pub const LOAD_ICON: &str = include_str!("../images/document-open.svg");
 pub const PREV_ICON: &str =
@@ -109,7 +109,9 @@ the Soloud sound library.
 </p>
 <p>
 It should be especially handy for audio books since at startup it restores
-the last played track at the exact position it had reached.
+the last played track at the exact position it had reached. And when the end
+of a track is reached, the next track in the same folder is automatically
+played (if there is one).
 </p>
 <p>
 Click the volume slider to change the volume (or press the <b>+</b> or
