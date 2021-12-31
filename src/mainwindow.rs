@@ -119,7 +119,7 @@ fn add_toolbar(
     add_toolbutton(
         sender,
         'c',
-        "Configure… • o",
+        "Configure… • c",
         Action::Options,
         OPTIONS_ICON,
         &mut button_box,

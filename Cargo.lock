@@ -16,7 +16,7 @@ checksum = "739f4a8db6605981345c5654f3a85b056ce52f37a39d34da03f25bf2151ea16e"
 
 [[package]]
 name = "amp-rs"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "chrono",
  "dirs",
@@ -169,7 +169,7 @@ dependencies = [
 [[package]]
 name = "fltk"
 version = "1.2.25"
-source = "git+https://github.com/fltk-rs/fltk-rs#741b8ad2e2f89a677aefc1d06049fefed5944be8"
+source = "git+https://github.com/fltk-rs/fltk-rs#f7b2032c7dd40e3acd7540932427f82651ebb887"
 dependencies = [
  "bitflags",
  "crossbeam-channel",
@@ -180,7 +180,7 @@ dependencies = [
 [[package]]
 name = "fltk-sys"
 version = "1.2.25"
-source = "git+https://github.com/fltk-rs/fltk-rs#741b8ad2e2f89a677aefc1d06049fefed5944be8"
+source = "git+https://github.com/fltk-rs/fltk-rs#f7b2032c7dd40e3acd7540932427f82651ebb887"
 dependencies = [
  "cmake",
 ]
@@ -408,9 +408,9 @@ checksum = "8d31d11c69a6b52a174b42bdc0c30e5e11670f90788b2c471c31c1d17d449443"
 
 [[package]]
 name = "ppv-lite86"
-version = "0.2.15"
+version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed0cfbc8191465bed66e1718596ee0b0b35d5ee1f41c5df2189d0fe8bde535ba"
+checksum = "eb9f9e6e233e5c4a35559a617bf40a4ec447db2e84c20b55a6f83167b7e57872"
 
 [[package]]
 name = "proc-macro2"
