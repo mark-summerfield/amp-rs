@@ -1,4 +1,4 @@
-// Copyright © 2021 Mark Summerfield. All rights reserved.
+// Copyright © 2021-22 Mark Summerfield. All rights reserved.
 // License: GPLv3
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
