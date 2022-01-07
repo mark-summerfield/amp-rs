@@ -6,7 +6,7 @@ use chrono::prelude::*;
 use std::env;
 
 pub static APPNAME: &str = "AMP";
-pub static VERSION: &str = "1.0.2";
+pub static VERSION: &str = "1.0.3";
 pub const ICON: &str = include_str!("../images/amp.svg");
 pub const LOAD_ICON: &str = include_str!("../images/document-open.svg");
 pub const PREV_ICON: &str =
@@ -59,7 +59,7 @@ pub enum Action {
 pub fn about_html(player: &soloud::Soloud) -> String {
     let year = Local::today().year();
     let year = if year == 2021 {
-        format!("{}", year)
+        year.to_string()
     } else {
         format!("2021-{}", year - 2000)
     };

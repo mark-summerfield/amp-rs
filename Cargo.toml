@@ -1,6 +1,6 @@
 [package]
 name = "amp-rs"
-version = "1.0.2"
+version = "1.0.3"
 edition = "2021"
 publish = true
 authors = [ "Mark Summerfield <mark@qtrac.eu>",]

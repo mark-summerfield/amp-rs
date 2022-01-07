@@ -155,7 +155,7 @@ impl Application {
             self.player.set_pause(self.handle, false);
             #[allow(clippy::clone_on_copy)]
             let sender = self.sender.clone();
-            fltk::app::add_timeout(TINY_TIMEOUT, move || {
+            fltk::app::add_timeout3(TINY_TIMEOUT, move |_| {
                 sender.send(Action::Tick);
             });
             PAUSE_ICON
@@ -169,7 +169,7 @@ impl Application {
     fn on_space_pressed(&mut self) {
         self.play_pause_button.set_value(true);
         let mut play_pause_button = self.play_pause_button.clone();
-        fltk::app::add_timeout(TINY_TIMEOUT, move || {
+        fltk::app::add_timeout3(TINY_TIMEOUT, move |_| {
             play_pause_button.set_value(false);
             play_pause_button.do_callback();
         });
@@ -268,7 +268,7 @@ impl Application {
             fltk::app::redraw(); // redraws the world
             #[allow(clippy::clone_on_copy)]
             let sender = self.sender.clone();
-            fltk::app::add_timeout(TICK_TIMEOUT, move || {
+            fltk::app::add_timeout3(TICK_TIMEOUT, move |_| {
                 sender.send(Action::Tick);
             });
         }
