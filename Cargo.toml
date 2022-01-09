@@ -1,6 +1,6 @@
 [package]
 name = "amp-rs"
-version = "1.0.3"
+version = "1.0.4"
 edition = "2021"
 publish = true
 authors = [ "Mark Summerfield <mark@qtrac.eu>",]
@@ -34,5 +34,6 @@ git = "https://github.com/moalyousef/soloud-rs"
 status = "passively-maintained"
 
 [profile.release]
+opt-level = "z"
+lto = true
 codegen-units = 1
-lto = "fat"

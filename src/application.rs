@@ -105,15 +105,17 @@ impl Application {
     }
 
     pub fn on_open(&mut self) {
-        if let Some(filename) = fltk::dialog::file_chooser(
-            &format!("Choose Track — {}", APPNAME),
-            "Audio Files (*.{flac,mogg,mp3,oga,ogg,wav})",
-            &util::get_track_dir(),
-            false,
-        ) {
+        let mut form = fltk::dialog::FileDialog::new(
+            fltk::dialog::FileDialogType::BrowseFile);
+        form.set_title(&format!("Choose Track — {}", APPNAME));
+        let _ = form.set_directory(&util::get_track_dir()); // Ignore error
+        form.set_filter("Audio Files\t*.{flac,mogg,mp3,oga,ogg,wav}");
+        form.show();
+        let filename = form.filename();
+        if filename.exists() {
             {
                 let mut config = CONFIG.get().write().unwrap();
-                config.track = std::path::PathBuf::from(filename);
+                config.track = filename;
                 config.pos = 0.0;
             }
             self.load_track();
