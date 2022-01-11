@@ -131,22 +131,18 @@ fn add_toolbar(
     );
     fltk::frame::Frame::default().with_size(PAD, PAD);
     let mut history_menu_button =
-        add_menubutton("History", HISTORY_ICON, &mut button_box);
-    populate_menu_button(
-        &mut history_menu_button,
-        Action::LoadHistoryTrack,
-        sender,
+        add_menubutton(0x68, "History • h", HISTORY_ICON, &mut button_box);
+    populate_history_menu_button(&mut history_menu_button, sender);
+    let mut remembered_menu_button = add_menubutton(
+        0x74,
+        "Remembered Tracks • t",
+        REMEMBERED_ICON,
+        &mut button_box,
     );
-    let mut remembered_menu_button =
-        add_menubutton("Remembered", REMEMBERED_ICON, &mut button_box);
-    populate_menu_button(
-        &mut remembered_menu_button,
-        Action::LoadRememberedTrack,
-        sender,
-    );
+    populate_remembered_menu_button(&mut remembered_menu_button, sender);
     fltk::frame::Frame::default().with_size(PAD, PAD);
     let mut menu_button =
-        add_menubutton("Menu", MENU_ICON, &mut button_box);
+        add_menubutton(0x6D, "Menu • m", MENU_ICON, &mut button_box);
     initialize_menu_button(&mut menu_button, sender);
     button_box.end();
     (
@@ -181,6 +177,7 @@ fn add_toolbutton(
 }
 
 fn add_menubutton(
+    codepoint: i32,
     tooltip: &str,
     icon: &str,
     button_box: &mut fltk::group::Flex,
@@ -194,29 +191,56 @@ fn add_menubutton(
     let mut icon = fltk::image::SvgImage::from_data(icon).unwrap();
     icon.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
     button.set_image(Some(icon));
+    button.handle(move |button, event| {
+        if event == fltk::enums::Event::KeyUp
+            && fltk::app::event_key().bits() == codepoint
+        {
+            button.popup();
+            return true;
+        }
+        false
+    });
     button_box.set_size(&button, width);
     button
 }
 
-fn populate_menu_button(
+pub fn populate_history_menu_button(
     menu_button: &mut fltk::menu::MenuButton,
-    action: Action,
     sender: fltk::app::Sender<Action>,
 ) {
     menu_button.clear();
     let config = CONFIG.get().read().unwrap();
-    let deque = if action == Action::LoadHistoryTrack {
-        &config.history
-    } else {
-        &config.remembered
-    };
-    for (i, track) in deque.iter().enumerate() {
+    for (i, track) in config.history.iter().enumerate() {
         menu_button.add_emit(
-            &format!("&{} {}", A_TO_Z[i], track),
+            &format!(
+                "&{} {}",
+                A_TO_Z[i],
+                track
+                    .to_string_lossy()
+                    .replace('\\', ">")
+                    .replace('/', ">")
+            ),
             fltk::enums::Shortcut::None,
             fltk::menu::MenuFlag::Normal,
             sender,
-            action,
+            Action::LoadHistoryTrack,
+        );
+    }
+}
+
+fn populate_remembered_menu_button(
+    menu_button: &mut fltk::menu::MenuButton,
+    sender: fltk::app::Sender<Action>,
+) {
+    menu_button.clear();
+    let config = CONFIG.get().read().unwrap();
+    for (i, track) in config.remembered.iter().enumerate() {
+        menu_button.add_emit(
+            &format!("&{} {}", A_TO_Z[i], track.to_string_lossy()),
+            fltk::enums::Shortcut::None,
+            fltk::menu::MenuFlag::Normal,
+            sender,
+            Action::LoadRememberedTrack,
         );
     }
 }

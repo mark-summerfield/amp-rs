@@ -24,7 +24,7 @@ pub const TIME_ICON: &str = include_str!("../images/time.svg");
 pub const HISTORY_ICON: &str = include_str!("../images/history.svg");
 pub const REMEMBERED_ICON: &str = include_str!("../images/remembered.svg");
 pub const MENU_ICON: &str = include_str!("../images/menu.svg");
-pub const AUTO_MENU_SIZE: i32 = 26;
+pub const AUTO_MENU_SIZE: usize = 26;
 pub const PAD: i32 = 6;
 pub const WINDOW_WIDTH_MIN: i32 = 440;
 pub const WINDOW_HEIGHT_MIN: i32 = 160;
@@ -57,6 +57,7 @@ pub enum Action {
     VolumeUp,
     VolumeUpdate,
     TimeUpdate,
+    AddToHistory,
     Remember,
     Forget,
     Options,

@@ -92,10 +92,10 @@ impl Application {
                     Action::Replay => self.on_replay(),
                     Action::PlayOrPause => self.on_play_or_pause(),
                     Action::LoadHistoryTrack => {
-                        println!("LoadHistoryTrack")
+                        self.on_load_history_track()
                     }
                     Action::LoadRememberedTrack => {
-                        println!("LoadRememberedTrack")
+                        println!("LoadRememberedTrack") // TODO
                     }
                     Action::SpacePressed => self.on_space_pressed(),
                     Action::Tick => self.on_tick(),
@@ -104,8 +104,9 @@ impl Application {
                     Action::VolumeUp => self.on_volume_up(),
                     Action::VolumeUpdate => self.on_volume_update(),
                     Action::TimeUpdate => self.on_time_update(),
-                    Action::Remember => println!("Remember"),
-                    Action::Forget => println!("Forget"),
+                    Action::AddToHistory => self.on_add_to_history(),
+                    Action::Remember => println!("Remember"), // TODO
+                    Action::Forget => println!("Forget"),     // TODO
                     Action::Options => self.on_options(),
                     Action::About => self.on_about(),
                     Action::Help => self.on_help(),

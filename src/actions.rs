@@ -4,10 +4,11 @@
 use super::CONFIG;
 use crate::application::Application;
 use crate::fixed::{
-    about_html, Action, APPNAME, HELP_HTML, LOAD_ERROR, PAUSE_ICON,
-    PLAY_ICON, TICK_TIMEOUT, TINY_TIMEOUT, TOOLBUTTON_SIZE,
+    about_html, Action, APPNAME, AUTO_MENU_SIZE, HELP_HTML, LOAD_ERROR,
+    PAUSE_ICON, PLAY_ICON, TICK_TIMEOUT, TINY_TIMEOUT, TOOLBUTTON_SIZE,
 };
 use crate::html_form;
+use crate::main_window;
 use crate::options_form;
 use crate::util;
 use fltk::prelude::*;
@@ -162,7 +163,7 @@ impl Application {
         config.window_height = self.main_window.height();
         config.volume = self.volume_slider.value();
         config.pos = self.time_slider.value();
-        // We already have the track
+        // We already have the track, history, and remembered
         config.save();
         self.app.quit();
     }
@@ -224,6 +225,10 @@ impl Application {
                     util::humanized_time(pos),
                     util::humanized_time(self.wav.length())
                 ));
+                let sender = self.sender.clone();
+                fltk::app::add_timeout3(TINY_TIMEOUT, move |_| {
+                    sender.send(Action::AddToHistory);
+                });
                 util::get_track_data_html(&config.track)
             }
             Err(_) => {
@@ -267,5 +272,40 @@ impl Application {
             util::humanized_time(self.wav.length())
         ));
         fltk::app::redraw(); // redraws the world
+    }
+
+    pub(crate) fn on_add_to_history(&mut self) {
+        let track = {
+            let config = CONFIG.get().read().unwrap();
+            if config.history.contains(&config.track) {
+                None
+            } else {
+                Some(config.track.clone())
+            }
+        };
+        let mut changed = false;
+        if let Some(track) = track {
+            let mut config = CONFIG.get().write().unwrap();
+            config.history.push_front(track.to_path_buf());
+            config.history.truncate(AUTO_MENU_SIZE);
+            changed = true;
+        }
+        if changed {
+            main_window::populate_history_menu_button(
+                &mut self.history_menu_button,
+                self.sender,
+            );
+        }
+    }
+
+    pub(crate) fn on_load_history_track(&mut self) {
+        let index = self.history_menu_button.value();
+        if index > -1 {
+            if let Some(track) = self.history_menu_button.text(index) {
+                let track = track.replace('>', "/");
+                let (_, track) = track.split_at(3);
+                self.auto_play_track(std::path::PathBuf::from(track));
+            }
+        }
     }
 }

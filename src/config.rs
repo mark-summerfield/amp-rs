@@ -8,6 +8,9 @@ use crate::fixed::{
 use crate::util;
 use std::collections::VecDeque;
 
+type HistoryDeque = VecDeque<std::path::PathBuf>;
+type RememberedVec = Vec<std::path::PathBuf>;
+
 #[derive(Clone, Debug)]
 pub struct Config {
     pub window_x: i32,
@@ -19,8 +22,8 @@ pub struct Config {
     pub pos: f64,
     pub track: std::path::PathBuf,
     pub filename: std::path::PathBuf,
-    pub history: VecDeque<String>,
-    pub remembered: VecDeque<String>,
+    pub history: HistoryDeque,
+    pub remembered: RememberedVec,
 }
 
 impl Config {
@@ -37,12 +40,8 @@ impl Config {
                 read_track_properties(properties, &mut config);
             }
             if let Some(properties) = ini.section(Some(GENERAL_SECTION)) {
-                read_deque(&properties, &HISTORY_KEY, &mut config.history);
-                read_deque(
-                    &properties,
-                    &REMEMBERED_KEY,
-                    &mut config.history,
-                );
+                read_history(&properties, &mut config.history);
+                read_remembered(&properties, &mut config.remembered);
             }
         }
         config
@@ -63,8 +62,8 @@ impl Config {
                 .set(VOLUME_KEY, self.volume.to_string())
                 .set(POS_KEY, self.pos.to_string())
                 .set(TRACK_KEY, self.track.to_string_lossy());
-            self.save_deque(&mut ini, HISTORY_KEY, &self.history);
-            self.save_deque(&mut ini, REMEMBERED_KEY, &self.remembered);
+            self.save_history(&mut ini);
+            self.save_remembered(&mut ini);
             match ini.write_to_file(&self.filename) {
                 Ok(_) => {}
                 Err(err) => self.warning(&format!(
@@ -75,15 +74,19 @@ impl Config {
         }
     }
 
-    fn save_deque(
-        &self,
-        ini: &mut ini::Ini,
-        key_base: &str,
-        deque: &VecDeque<String>,
-    ) {
-        for (i, s) in deque.iter().enumerate() {
-            let key = format!("{}{}", key_base, i + 1);
-            ini.with_section(Some(GENERAL_SECTION)).set(key, s.clone());
+    fn save_history(&self, ini: &mut ini::Ini) {
+        for (i, track) in self.history.iter().enumerate() {
+            let key = format!("{}{}", HISTORY_KEY, i + 1);
+            ini.with_section(Some(GENERAL_SECTION))
+                .set(key, track.to_string_lossy());
+        }
+    }
+
+    fn save_remembered(&self, ini: &mut ini::Ini) {
+        for (i, track) in self.remembered.iter().enumerate() {
+            let key = format!("{}{}", REMEMBERED_KEY, i + 1);
+            ini.with_section(Some(GENERAL_SECTION))
+                .set(key, track.to_string_lossy());
         }
     }
 
@@ -105,8 +108,8 @@ impl Default for Config {
             pos: 0.0,
             track: std::path::PathBuf::new(),
             filename: std::path::PathBuf::new(),
-            history: VecDeque::<String>::new(),
-            remembered: VecDeque::<String>::new(),
+            history: HistoryDeque::new(),
+            remembered: RememberedVec::new(),
         }
     }
 }
@@ -179,18 +182,30 @@ fn read_track_properties(
     }
 }
 
-fn read_deque(
-    properties: &ini::Properties,
-    key_base: &str,
-    deque: &mut VecDeque<String>,
-) {
-    deque.clear();
+fn read_history(properties: &ini::Properties, history: &mut HistoryDeque) {
+    history.clear();
     for i in 1..=AUTO_MENU_SIZE {
-        let key = format!("{}{}", key_base, i);
+        let key = format!("{}{}", HISTORY_KEY, i);
         if let Some(value) = properties.get(&key) {
-            let value = value.to_string();
-            if !deque.contains(&value) {
-                deque.push_back(value);
+            let value = std::path::PathBuf::from(value);
+            if !history.contains(&value) && value.exists() {
+                history.push_back(value);
+            }
+        }
+    }
+}
+
+fn read_remembered(
+    properties: &ini::Properties,
+    remembered: &mut RememberedVec,
+) {
+    remembered.clear();
+    for i in 1..=AUTO_MENU_SIZE {
+        let key = format!("{}{}", REMEMBERED_KEY, i);
+        if let Some(value) = properties.get(&key) {
+            let value = std::path::PathBuf::from(value);
+            if !remembered.contains(&value) && value.exists() {
+                remembered.push(value);
             }
         }
     }
