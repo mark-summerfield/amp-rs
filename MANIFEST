@@ -1,6 +1,7 @@
 src/main.rs
 src/config.rs
 src/application.rs
+src/action.rs
 src/mainwindow.rs
 src/html_form.rs
 src/options_form.rs

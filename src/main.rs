@@ -2,6 +2,7 @@
 // License: GPLv3
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod action;
 mod application;
 mod config;
 mod fixed;
