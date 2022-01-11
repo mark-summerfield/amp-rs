@@ -156,10 +156,10 @@ impl Application {
 
     pub(crate) fn on_quit(&mut self) {
         let mut config = CONFIG.get().write().unwrap();
-        config.window_x = self.mainwindow.x();
-        config.window_y = self.mainwindow.y();
-        config.window_width = self.mainwindow.width();
-        config.window_height = self.mainwindow.height();
+        config.window_x = self.main_window.x();
+        config.window_y = self.main_window.y();
+        config.window_width = self.main_window.width();
+        config.window_height = self.main_window.height();
         config.volume = self.volume_slider.value();
         config.pos = self.time_slider.value();
         // We already have the track

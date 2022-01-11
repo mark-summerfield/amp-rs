@@ -3,8 +3,8 @@
 
 use super::CONFIG;
 use crate::fixed::{
-    Action, ABOUT_ICON, APPNAME, BUTTON_HEIGHT, HELP_ICON, ICON, LOAD_ICON,
-    NEXT_ICON, OPTIONS_ICON, PAD, PLAY_ICON, PREV_ICON, QUIT_ICON,
+    Action, APPNAME, A_TO_Z, BUTTON_HEIGHT, HISTORY_ICON, ICON, LOAD_ICON,
+    MENU_ICON, NEXT_ICON, PAD, PLAY_ICON, PREV_ICON, REMEMBERED_ICON,
     REPLAY_ICON, TIME_ICON, TOOLBAR_HEIGHT, TOOLBUTTON_SIZE, VOLUME_ICON,
     WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
 };
@@ -12,8 +12,10 @@ use crate::util;
 use fltk::prelude::*;
 
 pub struct Widgets {
-    pub mainwindow: fltk::window::Window,
+    pub main_window: fltk::window::Window,
     pub play_pause_button: fltk::button::Button,
+    pub history_menu_button: fltk::menu::MenuButton,
+    pub remembered_menu_button: fltk::menu::MenuButton,
     pub info_view: fltk::misc::HelpView,
     pub volume_slider: fltk::valuator::HorFillSlider,
     pub volume_label: fltk::frame::Frame,
@@ -25,13 +27,13 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
     fltk::window::Window::set_default_xclass(APPNAME);
     let icon = fltk::image::SvgImage::from_data(ICON).unwrap();
     let (x, y, width, height) = get_config_window_rect();
-    let mut mainwindow =
+    let mut main_window =
         fltk::window::Window::new(x, y, width, height, APPNAME);
-    mainwindow.set_icon(Some(icon));
-    mainwindow.size_range(WINDOW_WIDTH_MIN, WINDOW_HEIGHT_MIN, 1024, 800);
+    main_window.set_icon(Some(icon));
+    main_window.size_range(WINDOW_WIDTH_MIN, WINDOW_HEIGHT_MIN, 1024, 800);
     let size = ((TOOLBUTTON_SIZE * 4) / 3) * 6;
-    mainwindow.size_range(size, size, size * 4, size * 4);
-    mainwindow.make_resizable(true);
+    main_window.size_range(size, size, size * 4, size * 4);
+    main_window.make_resizable(true);
     let mut vbox = fltk::group::Flex::default()
         .size_of_parent()
         .with_type(fltk::group::FlexType::Column);
@@ -42,13 +44,20 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
     let (time_box, time_slider, time_label) =
         add_slider_row(width, TIME_ICON, "0″/0″");
     vbox.set_size(&time_box, BUTTON_HEIGHT);
-    let (play_pause_button, toolbar) = add_toolbar(sender, width);
+    let (
+        play_pause_button,
+        history_menu_button,
+        remembered_menu_button,
+        toolbar,
+    ) = add_toolbar(sender, width);
     vbox.set_size(&toolbar, TOOLBAR_HEIGHT);
     vbox.end();
-    mainwindow.end();
+    main_window.end();
     Widgets {
-        mainwindow,
+        main_window,
         play_pause_button,
+        history_menu_button,
+        remembered_menu_button,
         info_view,
         volume_slider,
         volume_label,
@@ -69,7 +78,12 @@ fn add_info_view() -> fltk::misc::HelpView {
 fn add_toolbar(
     sender: fltk::app::Sender<Action>,
     width: i32,
-) -> (fltk::button::Button, fltk::group::Flex) {
+) -> (
+    fltk::button::Button,
+    fltk::menu::MenuButton,
+    fltk::menu::MenuButton,
+    fltk::group::Flex,
+) {
     let mut button_box = fltk::group::Flex::default()
         .with_size(width, TOOLBAR_HEIGHT)
         .with_type(fltk::group::FlexType::Row);
@@ -116,42 +130,31 @@ fn add_toolbar(
         &mut button_box,
     );
     fltk::frame::Frame::default().with_size(PAD, PAD);
-    add_toolbutton(
+    let mut history_menu_button =
+        add_menubutton("History", HISTORY_ICON, &mut button_box);
+    populate_menu_button(
+        &mut history_menu_button,
+        Action::LoadHistoryTrack,
         sender,
-        'c',
-        "Configure… • c",
-        Action::Options,
-        OPTIONS_ICON,
-        &mut button_box,
+    );
+    let mut remembered_menu_button =
+        add_menubutton("Remembered", REMEMBERED_ICON, &mut button_box);
+    populate_menu_button(
+        &mut remembered_menu_button,
+        Action::LoadRememberedTrack,
+        sender,
     );
     fltk::frame::Frame::default().with_size(PAD, PAD);
-    add_toolbutton(
-        sender,
-        'a',
-        "About • a",
-        Action::About,
-        ABOUT_ICON,
-        &mut button_box,
-    );
-    add_toolbutton(
-        sender,
-        'h',
-        "Help • F1 or h",
-        Action::Help,
-        HELP_ICON,
-        &mut button_box,
-    );
-    fltk::frame::Frame::default().with_size(PAD, PAD);
-    add_toolbutton(
-        sender,
-        'q',
-        "Quit • Esc or q",
-        Action::Quit,
-        QUIT_ICON,
-        &mut button_box,
-    );
+    let mut menu_button =
+        add_menubutton("Menu", MENU_ICON, &mut button_box);
+    initialize_menu_button(&mut menu_button, sender);
     button_box.end();
-    (play_pause_button, button_box)
+    (
+        play_pause_button,
+        history_menu_button,
+        remembered_menu_button,
+        button_box,
+    )
 }
 
 fn add_toolbutton(
@@ -175,6 +178,96 @@ fn add_toolbutton(
     button.emit(sender, action);
     button_box.set_size(&button, width);
     button
+}
+
+fn add_menubutton(
+    tooltip: &str,
+    icon: &str,
+    button_box: &mut fltk::group::Flex,
+) -> fltk::menu::MenuButton {
+    let width = TOOLBUTTON_SIZE + PAD + 8;
+    let mut button = fltk::menu::MenuButton::default();
+    button.set_size(width, TOOLBUTTON_SIZE + PAD);
+    button.visible_focus(false);
+    button.set_label_size(0);
+    button.set_tooltip(tooltip);
+    let mut icon = fltk::image::SvgImage::from_data(icon).unwrap();
+    icon.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
+    button.set_image(Some(icon));
+    button_box.set_size(&button, width);
+    button
+}
+
+fn populate_menu_button(
+    menu_button: &mut fltk::menu::MenuButton,
+    action: Action,
+    sender: fltk::app::Sender<Action>,
+) {
+    menu_button.clear();
+    let config = CONFIG.get().read().unwrap();
+    let deque = if action == Action::LoadHistoryTrack {
+        &config.history
+    } else {
+        &config.remembered
+    };
+    for (i, track) in deque.iter().enumerate() {
+        menu_button.add_emit(
+            &format!("&{} {}", A_TO_Z[i], track),
+            fltk::enums::Shortcut::None,
+            fltk::menu::MenuFlag::Normal,
+            sender,
+            action,
+        );
+    }
+}
+
+fn initialize_menu_button(
+    menu_button: &mut fltk::menu::MenuButton,
+    sender: fltk::app::Sender<Action>,
+) {
+    menu_button.set_label("&Menu");
+    menu_button.add_emit(
+        "&Remember this Track",
+        fltk::enums::Shortcut::None,
+        fltk::menu::MenuFlag::Normal,
+        sender,
+        Action::Remember,
+    );
+    menu_button.add_emit(
+        "&Forget this Track",
+        fltk::enums::Shortcut::None,
+        fltk::menu::MenuFlag::MenuDivider,
+        sender,
+        Action::Forget,
+    );
+    menu_button.add_emit(
+        "&Options…",
+        fltk::enums::Shortcut::None,
+        fltk::menu::MenuFlag::MenuDivider,
+        sender,
+        Action::Options,
+    );
+    menu_button.add_emit(
+        "&Help",
+        fltk::enums::Shortcut::None,
+        fltk::menu::MenuFlag::Normal,
+        sender,
+        Action::Help,
+    );
+    menu_button.add_emit(
+        "&About",
+        fltk::enums::Shortcut::None,
+        fltk::menu::MenuFlag::MenuDivider,
+        sender,
+        Action::About,
+    );
+    menu_button.add_emit(
+        "&Quit",
+        fltk::enums::Shortcut::None,
+        fltk::menu::MenuFlag::Normal,
+        sender,
+        Action::Quit,
+    );
 }
 
 fn add_volume_row(
@@ -238,18 +331,18 @@ fn get_config_window_rect() -> (i32, i32, i32, i32) {
 }
 
 pub fn add_event_handlers(
-    mainwindow: &mut fltk::window::Window,
+    main_window: &mut fltk::window::Window,
     sender: fltk::app::Sender<Action>,
 ) {
     // Both of these are really needed!
-    mainwindow.set_callback(move |_| {
+    main_window.set_callback(move |_| {
         if fltk::app::event() == fltk::enums::Event::Close
             || fltk::app::event_key() == fltk::enums::Key::Escape
         {
             sender.send(Action::Quit);
         }
     });
-    mainwindow.handle(move |_, event| {
+    main_window.handle(move |_, event| {
         if event == fltk::enums::Event::KeyUp {
             let key = fltk::app::event_key();
             if key.bits() == 0x20 {

@@ -2,9 +2,11 @@
 // License: GPLv3
 
 use crate::fixed::{
-    APPNAME, SCALE_MAX, SCALE_MIN, WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
+    APPNAME, AUTO_MENU_SIZE, SCALE_MAX, SCALE_MIN, WINDOW_HEIGHT_MIN,
+    WINDOW_WIDTH_MIN,
 };
 use crate::util;
+use std::collections::VecDeque;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -17,6 +19,8 @@ pub struct Config {
     pub pos: f64,
     pub track: std::path::PathBuf,
     pub filename: std::path::PathBuf,
+    pub history: VecDeque<String>,
+    pub remembered: VecDeque<String>,
 }
 
 impl Config {
@@ -31,6 +35,14 @@ impl Config {
             }
             if let Some(properties) = ini.section(Some(TRACK_SECTION)) {
                 read_track_properties(properties, &mut config);
+            }
+            if let Some(properties) = ini.section(Some(GENERAL_SECTION)) {
+                read_deque(&properties, &HISTORY_KEY, &mut config.history);
+                read_deque(
+                    &properties,
+                    &REMEMBERED_KEY,
+                    &mut config.history,
+                );
             }
         }
         config
@@ -51,6 +63,8 @@ impl Config {
                 .set(VOLUME_KEY, self.volume.to_string())
                 .set(POS_KEY, self.pos.to_string())
                 .set(TRACK_KEY, self.track.to_string_lossy());
+            self.save_deque(&mut ini, HISTORY_KEY, &self.history);
+            self.save_deque(&mut ini, REMEMBERED_KEY, &self.remembered);
             match ini.write_to_file(&self.filename) {
                 Ok(_) => {}
                 Err(err) => self.warning(&format!(
@@ -58,6 +72,18 @@ impl Config {
                     err
                 )),
             }
+        }
+    }
+
+    fn save_deque(
+        &self,
+        ini: &mut ini::Ini,
+        key_base: &str,
+        deque: &VecDeque<String>,
+    ) {
+        for (i, s) in deque.iter().enumerate() {
+            let key = format!("{}{}", key_base, i + 1);
+            ini.with_section(Some(GENERAL_SECTION)).set(key, s.clone());
         }
     }
 
@@ -79,6 +105,8 @@ impl Default for Config {
             pos: 0.0,
             track: std::path::PathBuf::new(),
             filename: std::path::PathBuf::new(),
+            history: VecDeque::<String>::new(),
+            remembered: VecDeque::<String>::new(),
         }
     }
 }
@@ -151,6 +179,23 @@ fn read_track_properties(
     }
 }
 
+fn read_deque(
+    properties: &ini::Properties,
+    key_base: &str,
+    deque: &mut VecDeque<String>,
+) {
+    deque.clear();
+    for i in 1..=AUTO_MENU_SIZE {
+        let key = format!("{}{}", key_base, i);
+        if let Some(value) = properties.get(&key) {
+            let value = value.to_string();
+            if !deque.contains(&value) {
+                deque.push_back(value);
+            }
+        }
+    }
+}
+
 static WINDOW_SECTION: &str = "Window";
 static X_KEY: &str = "x";
 static Y_KEY: &str = "y";
@@ -161,3 +206,6 @@ static TRACK_SECTION: &str = "Track";
 static VOLUME_KEY: &str = "volume";
 static POS_KEY: &str = "pos";
 static TRACK_KEY: &str = "track";
+static GENERAL_SECTION: &str = "General";
+static HISTORY_KEY: &str = "history";
+static REMEMBERED_KEY: &str = "remembered";

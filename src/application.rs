@@ -3,14 +3,16 @@
 
 use crate::fixed::Action;
 use crate::html_form;
-use crate::mainwindow;
+use crate::main_window;
 use fltk::prelude::*;
 use soloud::prelude::*;
 
 pub struct Application {
     pub(crate) app: fltk::app::App,
-    pub(crate) mainwindow: fltk::window::Window,
+    pub(crate) main_window: fltk::window::Window,
     pub(crate) play_pause_button: fltk::button::Button,
+    pub(crate) history_menu_button: fltk::menu::MenuButton,
+    pub(crate) remembered_menu_button: fltk::menu::MenuButton,
     pub(crate) info_view: fltk::misc::HelpView,
     pub(crate) volume_slider: fltk::valuator::HorFillSlider,
     pub(crate) volume_label: fltk::frame::Frame,
@@ -31,19 +33,21 @@ impl Application {
         let app =
             fltk::app::App::default().with_scheme(fltk::app::Scheme::Gleam);
         let (sender, receiver) = fltk::app::channel::<Action>();
-        let mut widgets = mainwindow::make(sender);
-        mainwindow::add_event_handlers(&mut widgets.mainwindow, sender);
-        widgets.mainwindow.show();
+        let mut widgets = main_window::make(sender);
+        main_window::add_event_handlers(&mut widgets.main_window, sender);
+        widgets.main_window.show();
         let mut player =
             soloud::Soloud::default().expect("Cannot access audio backend");
         player.set_pause_all(true);
-        let load = mainwindow::update_widgets_from_config(&mut widgets);
+        let load = main_window::update_widgets_from_config(&mut widgets);
         let mut volume_slider = widgets.volume_slider.clone();
         let mut time_slider = widgets.time_slider.clone();
         let app = Self {
             app,
-            mainwindow: widgets.mainwindow,
+            main_window: widgets.main_window,
             play_pause_button: widgets.play_pause_button,
+            history_menu_button: widgets.history_menu_button,
+            remembered_menu_button: widgets.remembered_menu_button,
             info_view: widgets.info_view,
             volume_slider: widgets.volume_slider,
             volume_label: widgets.volume_label,
@@ -87,6 +91,12 @@ impl Application {
                     Action::Previous => self.on_previous(),
                     Action::Replay => self.on_replay(),
                     Action::PlayOrPause => self.on_play_or_pause(),
+                    Action::LoadHistoryTrack => {
+                        println!("LoadHistoryTrack")
+                    }
+                    Action::LoadRememberedTrack => {
+                        println!("LoadRememberedTrack")
+                    }
                     Action::SpacePressed => self.on_space_pressed(),
                     Action::Tick => self.on_tick(),
                     Action::Next => self.on_next(),
@@ -94,6 +104,8 @@ impl Application {
                     Action::VolumeUp => self.on_volume_up(),
                     Action::VolumeUpdate => self.on_volume_update(),
                     Action::TimeUpdate => self.on_time_update(),
+                    Action::Remember => println!("Remember"),
+                    Action::Forget => println!("Forget"),
                     Action::Options => self.on_options(),
                     Action::About => self.on_about(),
                     Action::Help => self.on_help(),
