@@ -32,10 +32,9 @@ impl Application {
         if filename.exists() {
             {
                 let mut config = CONFIG.get().write().unwrap();
-                config.track = filename;
                 config.pos = 0.0;
             }
-            self.load_track();
+            self.auto_play_track(filename);
         }
     }
 
@@ -350,5 +349,31 @@ impl Application {
         }
     }
 
-    pub(crate) fn on_delete_bookmark(&mut self) {}
+    pub(crate) fn on_delete_bookmark(&mut self) {
+        let track = {
+            let config = CONFIG.get().read().unwrap();
+            if !config.bookmarks.contains(&config.track) {
+                None
+            } else {
+                Some(config.track.clone())
+            }
+        };
+        let mut changed = false;
+        if let Some(track) = track {
+            let mut config = CONFIG.get().write().unwrap();
+            match config.bookmarks.binary_search(&track) {
+                Ok(index) => {
+                    config.bookmarks.remove(index);
+                    changed = true;
+                }
+                Err(_) => (),
+            };
+        }
+        if changed {
+            main_window::populate_bookmarks_menu_button(
+                &mut self.bookmarks_menu_button,
+                self.sender,
+            );
+        }
+    }
 }

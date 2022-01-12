@@ -281,8 +281,8 @@ fn initialize_menu_button(
         Action::Options,
     );
     menu_button.add_emit(
-        "&Help",
-        fltk::enums::Shortcut::None,
+        "&Help • F1",
+        fltk::enums::Shortcut::None, // handled elsewhere
         fltk::menu::MenuFlag::Normal,
         sender,
         Action::Help,
@@ -295,8 +295,8 @@ fn initialize_menu_button(
         Action::About,
     );
     menu_button.add_emit(
-        "&Quit",
-        fltk::enums::Shortcut::None,
+        "&Quit • Esc",
+        fltk::enums::Shortcut::None, // handled elsewhere
         fltk::menu::MenuFlag::Normal,
         sender,
         Action::Quit,
