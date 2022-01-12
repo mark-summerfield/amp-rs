@@ -2,8 +2,8 @@
 // License: GPLv3
 
 use crate::fixed::{
-    APPNAME, AUTO_MENU_SIZE, SCALE_MAX, SCALE_MIN, WINDOW_HEIGHT_MIN,
-    WINDOW_WIDTH_MIN,
+    APPNAME, BOOKMARKS_SIZE, HISTORY_SIZE, SCALE_MAX, SCALE_MIN,
+    WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
 };
 use crate::util;
 use std::collections::VecDeque;
@@ -186,7 +186,7 @@ fn read_track_properties(
 
 fn read_history(properties: &ini::Properties, history: &mut History) {
     history.clear();
-    for i in 1..=AUTO_MENU_SIZE {
+    for i in 1..=HISTORY_SIZE {
         let key = format!("{}{}", HISTORY_KEY, i);
         if let Some(value) = properties.get(&key) {
             let value = std::path::PathBuf::from(value);
@@ -197,12 +197,9 @@ fn read_history(properties: &ini::Properties, history: &mut History) {
     }
 }
 
-fn read_bookmarks(
-    properties: &ini::Properties,
-    bookmarks: &mut Bookmarks,
-) {
+fn read_bookmarks(properties: &ini::Properties, bookmarks: &mut Bookmarks) {
     bookmarks.clear();
-    for i in 1..=AUTO_MENU_SIZE {
+    for i in 1..=BOOKMARKS_SIZE {
         let key = format!("{}{}", BOOKMARK_KEY, i);
         if let Some(value) = properties.get(&key) {
             let value = std::path::PathBuf::from(value);

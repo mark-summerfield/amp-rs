@@ -3,8 +3,8 @@
 
 use super::CONFIG;
 use crate::fixed::{
-    Action, ADD_BOOKMARK_ICON, APPNAME, A_TO_Z, BOOKMARKS_ICON,
-    BUTTON_HEIGHT, DELETE_BOOKMARK_ICON, HISTORY_ICON, ICON, LOAD_ICON,
+    Action, ADD_BOOKMARK_ICON, APPNAME, BOOKMARKS_ICON, BUTTON_HEIGHT,
+    DELETE_BOOKMARK_ICON, HISTORY_ICON, ICON, LOAD_ICON, MENU_CHARS,
     MENU_ICON, NEXT_ICON, PAD, PATH_SEP, PLAY_ICON, PREV_ICON, REPLAY_ICON,
     TIME_ICON, TOOLBAR_HEIGHT, TOOLBUTTON_SIZE, VOLUME_ICON,
     WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
@@ -261,7 +261,7 @@ pub(crate) fn populate_bookmarks_menu_button(
 fn track_menu_option(index: usize, track: &std::path::Path) -> String {
     format!(
         "&{} {}",
-        A_TO_Z[index],
+        MENU_CHARS[index],
         track
             .to_string_lossy()
             .replace(&['\\', '/'][..], &PATH_SEP.to_string())

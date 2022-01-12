@@ -4,9 +4,9 @@
 use super::CONFIG;
 use crate::application::Application;
 use crate::fixed::{
-    about_html, Action, APPNAME, AUTO_MENU_SIZE, HELP_HTML, LOAD_ERROR,
-    PATH_SEP, PAUSE_ICON, PLAY_ICON, TICK_TIMEOUT, TINY_TIMEOUT,
-    TOOLBUTTON_SIZE,
+    about_html, Action, APPNAME, BOOKMARKS_SIZE, HELP_HTML, HISTORY_SIZE,
+    LOAD_ERROR, PATH_SEP, PAUSE_ICON, PLAY_ICON, TICK_TIMEOUT,
+    TINY_TIMEOUT, TOOLBUTTON_SIZE,
 };
 use crate::html_form;
 use crate::main_window;
@@ -288,7 +288,7 @@ impl Application {
         if let Some(track) = track {
             let mut config = CONFIG.get().write().unwrap();
             config.history.push_front(track);
-            config.history.truncate(AUTO_MENU_SIZE);
+            config.history.truncate(HISTORY_SIZE);
             changed = true;
         }
         if changed {
@@ -335,8 +335,8 @@ impl Application {
         let mut changed = false;
         if let Some(track) = track {
             let mut config = CONFIG.get().write().unwrap();
-            if config.bookmarks.len() >= AUTO_MENU_SIZE {
-                config.bookmarks.truncate(AUTO_MENU_SIZE - 1); // make room
+            if config.bookmarks.len() >= BOOKMARKS_SIZE {
+                config.bookmarks.truncate(BOOKMARKS_SIZE - 1); // make room
             }
             config.bookmarks.push(track);
             config.bookmarks.sort();
