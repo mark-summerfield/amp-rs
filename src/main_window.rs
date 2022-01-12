@@ -103,8 +103,8 @@ fn add_toolbar(
     );
     add_toolbutton(
         sender,
-        fltk::enums::Shortcut::from_key(fltk::enums::Key::Left),
-        "Previous track • ←",
+        fltk::enums::Shortcut::from_key(fltk::enums::Key::F4),
+        "Previous track • F4",
         Action::Previous,
         PREV_ICON,
         &mut button_box,
@@ -112,7 +112,7 @@ fn add_toolbar(
     add_toolbutton(
         sender,
         fltk::enums::Shortcut::from_char('r'),
-        "Replay the current track • r",
+        "Replay the current track • r or F5",
         Action::Replay,
         REPLAY_ICON,
         &mut button_box,
@@ -127,8 +127,8 @@ fn add_toolbar(
     );
     add_toolbutton(
         sender,
-        fltk::enums::Shortcut::from_key(fltk::enums::Key::Right),
-        "Next track • →",
+        fltk::enums::Shortcut::from_key(fltk::enums::Key::F6),
+        "Next track • F6",
         Action::Next,
         NEXT_ICON,
         &mut button_box,
@@ -391,6 +391,10 @@ pub fn add_event_handlers(
                 || fltk::app::event_key() == fltk::enums::Key::F1
             {
                 sender.send(Action::Help);
+                return true;
+            }
+            if fltk::app::event_key() == fltk::enums::Key::F5 {
+                sender.send(Action::Replay);
                 return true;
             }
         }

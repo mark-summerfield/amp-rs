@@ -112,7 +112,7 @@ pub static LOAD_ERROR: &str = "
 <font color=magenta>\"FILE\".</font>
 </body>";
 
-// TODO o Open | <- Prev | r Replay | p & Space Play/Pause | -> Next
+// TODO o Open | F4 Prev | r & F5 Replay | p & Space Play/Pause | F6 Next
 // | h History | b Bookmarks | a Add Bookmark | d Delete Bookmark | m Menu
 pub static HELP_HTML: &str = "<body>
 <p><center><font color=navy size=6><b>AMP</b></font></center></p>
