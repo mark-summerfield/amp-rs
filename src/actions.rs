@@ -5,7 +5,8 @@ use super::CONFIG;
 use crate::application::Application;
 use crate::fixed::{
     about_html, Action, APPNAME, AUTO_MENU_SIZE, HELP_HTML, LOAD_ERROR,
-    PAUSE_ICON, PLAY_ICON, TICK_TIMEOUT, TINY_TIMEOUT, TOOLBUTTON_SIZE,
+    PATH_SEP, PAUSE_ICON, PLAY_ICON, TICK_TIMEOUT, TINY_TIMEOUT,
+    TOOLBUTTON_SIZE,
 };
 use crate::html_form;
 use crate::main_window;
@@ -302,7 +303,7 @@ impl Application {
         let index = self.history_menu_button.value();
         if index > -1 {
             if let Some(track) = self.history_menu_button.text(index) {
-                let track = track.replace('>', "/");
+                let track = track.replace(PATH_SEP, "/");
                 let (_, track) = track.split_at(3);
                 self.auto_play_track(std::path::PathBuf::from(track));
             }

@@ -5,7 +5,7 @@ use super::CONFIG;
 use crate::fixed::{
     Action, ADD_BOOKMARK_ICON, APPNAME, A_TO_Z, BOOKMARKS_ICON,
     BUTTON_HEIGHT, DELETE_BOOKMARK_ICON, HISTORY_ICON, ICON, LOAD_ICON,
-    MENU_ICON, NEXT_ICON, PAD, PLAY_ICON, PREV_ICON, REPLAY_ICON,
+    MENU_ICON, NEXT_ICON, PAD, PATH_SEP, PLAY_ICON, PREV_ICON, REPLAY_ICON,
     TIME_ICON, TOOLBAR_HEIGHT, TOOLBUTTON_SIZE, VOLUME_ICON,
     WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
 };
@@ -237,8 +237,7 @@ pub fn populate_history_menu_button(
                 A_TO_Z[i],
                 track
                     .to_string_lossy()
-                    .replace('\\', ">")
-                    .replace('/', ">")
+                    .replace(&['\\', '/'][..], &PATH_SEP.to_string())
             ),
             fltk::enums::Shortcut::None,
             fltk::menu::MenuFlag::Normal,

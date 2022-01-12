@@ -106,7 +106,7 @@ pub fn get_track_data_html(track: &std::path::Path) -> String {
     } else {
         track.to_string_lossy()
     };
-    let name = name.replace("_", " ").replace("-", " ");
+    let name = name.replace(&['_', '-'][..], " ");
     match get_track_tag(track) {
         Ok(Some(data)) => {
             let mut text = String::from("<font color=navy><b>");
