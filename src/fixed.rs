@@ -22,12 +22,16 @@ pub const VOLUME_ICON: &str =
     include_str!("../images/audio-volume-high.svg");
 pub const TIME_ICON: &str = include_str!("../images/time.svg");
 pub const HISTORY_ICON: &str = include_str!("../images/history.svg");
-pub const REMEMBERED_ICON: &str = include_str!("../images/remembered.svg");
+pub const BOOKMARKS_ICON: &str = include_str!("../images/bookmarks.svg");
+pub const ADD_BOOKMARK_ICON: &str =
+    include_str!("../images/addbookmark.svg");
+pub const DELETE_BOOKMARK_ICON: &str =
+    include_str!("../images/deletebookmark.svg");
 pub const MENU_ICON: &str = include_str!("../images/menu.svg");
 pub const AUTO_MENU_SIZE: usize = 26;
 pub const PAD: i32 = 6;
-pub const WINDOW_WIDTH_MIN: i32 = 440;
-pub const WINDOW_HEIGHT_MIN: i32 = 160;
+pub const WINDOW_WIDTH_MIN: i32 = 480;
+pub const WINDOW_HEIGHT_MIN: i32 = 240;
 pub const TOOLBUTTON_SIZE: i32 = 28;
 pub const TOOLBAR_HEIGHT: i32 = ((TOOLBUTTON_SIZE * 3) / 2) + (2 * PAD);
 pub const BUTTON_HEIGHT: i32 = 30;
@@ -49,7 +53,7 @@ pub enum Action {
     Replay,
     PlayOrPause,
     LoadHistoryTrack,
-    LoadRememberedTrack,
+    LoadBookmarkedTrack,
     SpacePressed,
     Tick,
     Next,
@@ -58,8 +62,8 @@ pub enum Action {
     VolumeUpdate,
     TimeUpdate,
     AddToHistory,
-    Remember,
-    Forget,
+    AddBookmark,
+    DeleteBookmark,
     Options,
     About,
     Help,
@@ -108,6 +112,8 @@ pub static LOAD_ERROR: &str = "
 <font color=magenta>\"FILE\".</font>
 </body>";
 
+// TODO o Open | <- Prev | r Replay | p & Space Play/Pause | -> Next
+// | h History | b Bookmarks | a Add Bookmark | d Delete Bookmark | m Menu
 pub static HELP_HTML: &str = "<body>
 <p><center><font color=navy size=6><b>AMP</b></font></center></p>
 <p><center><font color=blue size=5>“Another Music Player‟</font>

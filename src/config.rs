@@ -9,7 +9,7 @@ use crate::util;
 use std::collections::VecDeque;
 
 type HistoryDeque = VecDeque<std::path::PathBuf>;
-type RememberedVec = Vec<std::path::PathBuf>;
+type BookmarksVec = Vec<std::path::PathBuf>;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -23,7 +23,7 @@ pub struct Config {
     pub track: std::path::PathBuf,
     pub filename: std::path::PathBuf,
     pub history: HistoryDeque,
-    pub remembered: RememberedVec,
+    pub bookmarks: BookmarksVec,
 }
 
 impl Config {
@@ -39,9 +39,11 @@ impl Config {
             if let Some(properties) = ini.section(Some(TRACK_SECTION)) {
                 read_track_properties(properties, &mut config);
             }
-            if let Some(properties) = ini.section(Some(GENERAL_SECTION)) {
+            if let Some(properties) = ini.section(Some(HISTORY_SECTION)) {
                 read_history(&properties, &mut config.history);
-                read_remembered(&properties, &mut config.remembered);
+            }
+            if let Some(properties) = ini.section(Some(BOOKMARK_SECTION)) {
+                read_bookmarks(&properties, &mut config.bookmarks);
             }
         }
         config
@@ -63,7 +65,7 @@ impl Config {
                 .set(POS_KEY, self.pos.to_string())
                 .set(TRACK_KEY, self.track.to_string_lossy());
             self.save_history(&mut ini);
-            self.save_remembered(&mut ini);
+            self.save_bookmarks(&mut ini);
             match ini.write_to_file(&self.filename) {
                 Ok(_) => {}
                 Err(err) => self.warning(&format!(
@@ -77,15 +79,15 @@ impl Config {
     fn save_history(&self, ini: &mut ini::Ini) {
         for (i, track) in self.history.iter().enumerate() {
             let key = format!("{}{}", HISTORY_KEY, i + 1);
-            ini.with_section(Some(GENERAL_SECTION))
+            ini.with_section(Some(HISTORY_SECTION))
                 .set(key, track.to_string_lossy());
         }
     }
 
-    fn save_remembered(&self, ini: &mut ini::Ini) {
-        for (i, track) in self.remembered.iter().enumerate() {
-            let key = format!("{}{}", REMEMBERED_KEY, i + 1);
-            ini.with_section(Some(GENERAL_SECTION))
+    fn save_bookmarks(&self, ini: &mut ini::Ini) {
+        for (i, track) in self.bookmarks.iter().enumerate() {
+            let key = format!("{}{}", BOOKMARK_KEY, i + 1);
+            ini.with_section(Some(BOOKMARK_SECTION))
                 .set(key, track.to_string_lossy());
         }
     }
@@ -109,7 +111,7 @@ impl Default for Config {
             track: std::path::PathBuf::new(),
             filename: std::path::PathBuf::new(),
             history: HistoryDeque::new(),
-            remembered: RememberedVec::new(),
+            bookmarks: BookmarksVec::new(),
         }
     }
 }
@@ -195,17 +197,17 @@ fn read_history(properties: &ini::Properties, history: &mut HistoryDeque) {
     }
 }
 
-fn read_remembered(
+fn read_bookmarks(
     properties: &ini::Properties,
-    remembered: &mut RememberedVec,
+    bookmarks: &mut BookmarksVec,
 ) {
-    remembered.clear();
+    bookmarks.clear();
     for i in 1..=AUTO_MENU_SIZE {
-        let key = format!("{}{}", REMEMBERED_KEY, i);
+        let key = format!("{}{}", BOOKMARK_KEY, i);
         if let Some(value) = properties.get(&key) {
             let value = std::path::PathBuf::from(value);
-            if !remembered.contains(&value) && value.exists() {
-                remembered.push(value);
+            if !bookmarks.contains(&value) && value.exists() {
+                bookmarks.push(value);
             }
         }
     }
@@ -221,6 +223,7 @@ static TRACK_SECTION: &str = "Track";
 static VOLUME_KEY: &str = "volume";
 static POS_KEY: &str = "pos";
 static TRACK_KEY: &str = "track";
-static GENERAL_SECTION: &str = "General";
+static HISTORY_SECTION: &str = "History";
 static HISTORY_KEY: &str = "history";
-static REMEMBERED_KEY: &str = "remembered";
+static BOOKMARK_SECTION: &str = "Boomarks";
+static BOOKMARK_KEY: &str = "boomark";

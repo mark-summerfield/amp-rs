@@ -12,7 +12,7 @@ pub struct Application {
     pub(crate) main_window: fltk::window::Window,
     pub(crate) play_pause_button: fltk::button::Button,
     pub(crate) history_menu_button: fltk::menu::MenuButton,
-    pub(crate) remembered_menu_button: fltk::menu::MenuButton,
+    pub(crate) bookmarks_menu_button: fltk::menu::MenuButton,
     pub(crate) info_view: fltk::misc::HelpView,
     pub(crate) volume_slider: fltk::valuator::HorFillSlider,
     pub(crate) volume_label: fltk::frame::Frame,
@@ -47,7 +47,7 @@ impl Application {
             main_window: widgets.main_window,
             play_pause_button: widgets.play_pause_button,
             history_menu_button: widgets.history_menu_button,
-            remembered_menu_button: widgets.remembered_menu_button,
+            bookmarks_menu_button: widgets.bookmarks_menu_button,
             info_view: widgets.info_view,
             volume_slider: widgets.volume_slider,
             volume_label: widgets.volume_label,
@@ -94,8 +94,8 @@ impl Application {
                     Action::LoadHistoryTrack => {
                         self.on_load_history_track()
                     }
-                    Action::LoadRememberedTrack => {
-                        println!("LoadRememberedTrack") // TODO
+                    Action::LoadBookmarkedTrack => {
+                        println!("LoadBookmarkedTrack") // TODO
                     }
                     Action::SpacePressed => self.on_space_pressed(),
                     Action::Tick => self.on_tick(),
@@ -105,8 +105,8 @@ impl Application {
                     Action::VolumeUpdate => self.on_volume_update(),
                     Action::TimeUpdate => self.on_time_update(),
                     Action::AddToHistory => self.on_add_to_history(),
-                    Action::Remember => println!("Remember"), // TODO
-                    Action::Forget => println!("Forget"),     // TODO
+                    Action::AddBookmark => println!("AddBookmark"), // TODO
+                    Action::DeleteBookmark => println!("DeleteBookmark"),     // TODO
                     Action::Options => self.on_options(),
                     Action::About => self.on_about(),
                     Action::Help => self.on_help(),

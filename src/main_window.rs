@@ -3,9 +3,10 @@
 
 use super::CONFIG;
 use crate::fixed::{
-    Action, APPNAME, A_TO_Z, BUTTON_HEIGHT, HISTORY_ICON, ICON, LOAD_ICON,
-    MENU_ICON, NEXT_ICON, PAD, PLAY_ICON, PREV_ICON, REMEMBERED_ICON,
-    REPLAY_ICON, TIME_ICON, TOOLBAR_HEIGHT, TOOLBUTTON_SIZE, VOLUME_ICON,
+    Action, ADD_BOOKMARK_ICON, APPNAME, A_TO_Z, BOOKMARKS_ICON,
+    BUTTON_HEIGHT, DELETE_BOOKMARK_ICON, HISTORY_ICON, ICON, LOAD_ICON,
+    MENU_ICON, NEXT_ICON, PAD, PLAY_ICON, PREV_ICON, REPLAY_ICON,
+    TIME_ICON, TOOLBAR_HEIGHT, TOOLBUTTON_SIZE, VOLUME_ICON,
     WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
 };
 use crate::util;
@@ -15,7 +16,7 @@ pub struct Widgets {
     pub main_window: fltk::window::Window,
     pub play_pause_button: fltk::button::Button,
     pub history_menu_button: fltk::menu::MenuButton,
-    pub remembered_menu_button: fltk::menu::MenuButton,
+    pub bookmarks_menu_button: fltk::menu::MenuButton,
     pub info_view: fltk::misc::HelpView,
     pub volume_slider: fltk::valuator::HorFillSlider,
     pub volume_label: fltk::frame::Frame,
@@ -30,7 +31,12 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
     let mut main_window =
         fltk::window::Window::new(x, y, width, height, APPNAME);
     main_window.set_icon(Some(icon));
-    main_window.size_range(WINDOW_WIDTH_MIN, WINDOW_HEIGHT_MIN, 1024, 800);
+    main_window.size_range(
+        WINDOW_WIDTH_MIN,
+        WINDOW_HEIGHT_MIN,
+        fltk::app::screen_size().0 as i32,
+        fltk::app::screen_size().1 as i32,
+    );
     let size = ((TOOLBUTTON_SIZE * 4) / 3) * 6;
     main_window.size_range(size, size, size * 4, size * 4);
     main_window.make_resizable(true);
@@ -47,7 +53,7 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
     let (
         play_pause_button,
         history_menu_button,
-        remembered_menu_button,
+        bookmarks_menu_button,
         toolbar,
     ) = add_toolbar(sender, width);
     vbox.set_size(&toolbar, TOOLBAR_HEIGHT);
@@ -57,7 +63,7 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
         main_window,
         play_pause_button,
         history_menu_button,
-        remembered_menu_button,
+        bookmarks_menu_button,
         info_view,
         volume_slider,
         volume_label,
@@ -91,7 +97,7 @@ fn add_toolbar(
     button_box.set_margin(PAD);
     add_toolbutton(
         sender,
-        'o',
+        fltk::enums::Shortcut::from_char('o'),
         "Open a track ready to play • o",
         Action::Load,
         LOAD_ICON,
@@ -99,15 +105,15 @@ fn add_toolbar(
     );
     add_toolbutton(
         sender,
-        'b',
-        "Back to previous track • b",
+        fltk::enums::Shortcut::from_key(fltk::enums::Key::Left),
+        "Previous track • ←",
         Action::Previous,
         PREV_ICON,
         &mut button_box,
     );
     add_toolbutton(
         sender,
-        'r',
+        fltk::enums::Shortcut::from_char('r'),
         "Replay the current track • r",
         Action::Replay,
         REPLAY_ICON,
@@ -115,7 +121,7 @@ fn add_toolbar(
     );
     let play_pause_button = add_toolbutton(
         sender,
-        'p',
+        fltk::enums::Shortcut::from_char('p'),
         "Play or Pause the current track • p or Space",
         Action::PlayOrPause,
         PLAY_ICON,
@@ -123,8 +129,8 @@ fn add_toolbar(
     );
     add_toolbutton(
         sender,
-        'n',
-        "Next track • n",
+        fltk::enums::Shortcut::from_key(fltk::enums::Key::Right),
+        "Next track • →",
         Action::Next,
         NEXT_ICON,
         &mut button_box,
@@ -133,13 +139,29 @@ fn add_toolbar(
     let mut history_menu_button =
         add_menubutton(0x68, "History • h", HISTORY_ICON, &mut button_box);
     populate_history_menu_button(&mut history_menu_button, sender);
-    let mut remembered_menu_button = add_menubutton(
-        0x74,
-        "Remembered Tracks • t",
-        REMEMBERED_ICON,
+    let mut bookmarks_menu_button = add_menubutton(
+        0x62,
+        "Bookmarks • b",
+        BOOKMARKS_ICON,
         &mut button_box,
     );
-    populate_remembered_menu_button(&mut remembered_menu_button, sender);
+    populate_bookmarks_menu_button(&mut bookmarks_menu_button, sender);
+    add_toolbutton(
+        sender,
+        fltk::enums::Shortcut::from_char('a'),
+        "Add Track to Bookmarks • a",
+        Action::AddBookmark,
+        ADD_BOOKMARK_ICON,
+        &mut button_box,
+    );
+    add_toolbutton(
+        sender,
+        fltk::enums::Shortcut::from_char('d'),
+        "Delete Track from Bookmarks • d",
+        Action::DeleteBookmark,
+        DELETE_BOOKMARK_ICON,
+        &mut button_box,
+    );
     fltk::frame::Frame::default().with_size(PAD, PAD);
     let mut menu_button =
         add_menubutton(0x6D, "Menu • m", MENU_ICON, &mut button_box);
@@ -148,14 +170,14 @@ fn add_toolbar(
     (
         play_pause_button,
         history_menu_button,
-        remembered_menu_button,
+        bookmarks_menu_button,
         button_box,
     )
 }
 
 fn add_toolbutton(
     sender: fltk::app::Sender<Action>,
-    shortcut: char,
+    shortcut: fltk::enums::Shortcut,
     tooltip: &str,
     action: Action,
     icon: &str,
@@ -166,7 +188,7 @@ fn add_toolbutton(
     button.set_size(width, TOOLBUTTON_SIZE + PAD);
     button.visible_focus(false);
     button.set_label_size(0);
-    button.set_shortcut(fltk::enums::Shortcut::from_char(shortcut));
+    button.set_shortcut(shortcut);
     button.set_tooltip(tooltip);
     let mut icon = fltk::image::SvgImage::from_data(icon).unwrap();
     icon.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
@@ -228,19 +250,19 @@ pub fn populate_history_menu_button(
     }
 }
 
-fn populate_remembered_menu_button(
+fn populate_bookmarks_menu_button(
     menu_button: &mut fltk::menu::MenuButton,
     sender: fltk::app::Sender<Action>,
 ) {
     menu_button.clear();
     let config = CONFIG.get().read().unwrap();
-    for (i, track) in config.remembered.iter().enumerate() {
+    for (i, track) in config.bookmarks.iter().enumerate() {
         menu_button.add_emit(
             &format!("&{} {}", A_TO_Z[i], track.to_string_lossy()),
             fltk::enums::Shortcut::None,
             fltk::menu::MenuFlag::Normal,
             sender,
-            Action::LoadRememberedTrack,
+            Action::LoadBookmarkedTrack,
         );
     }
 }
@@ -250,20 +272,6 @@ fn initialize_menu_button(
     sender: fltk::app::Sender<Action>,
 ) {
     menu_button.set_label("&Menu");
-    menu_button.add_emit(
-        "&Remember this Track",
-        fltk::enums::Shortcut::None,
-        fltk::menu::MenuFlag::Normal,
-        sender,
-        Action::Remember,
-    );
-    menu_button.add_emit(
-        "&Forget this Track",
-        fltk::enums::Shortcut::None,
-        fltk::menu::MenuFlag::MenuDivider,
-        sender,
-        Action::Forget,
-    );
     menu_button.add_emit(
         "&Options…",
         fltk::enums::Shortcut::None,

@@ -163,7 +163,7 @@ impl Application {
         config.window_height = self.main_window.height();
         config.volume = self.volume_slider.value();
         config.pos = self.time_slider.value();
-        // We already have the track, history, and remembered
+        // We already have the track, history, and bookmarks
         config.save();
         self.app.quit();
     }
