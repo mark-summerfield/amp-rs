@@ -30,10 +30,6 @@ impl Application {
         form.show();
         let filename = form.filename();
         if filename.exists() {
-            {
-                let mut config = CONFIG.get().write().unwrap();
-                config.pos = 0.0;
-            }
             self.auto_play_track(filename);
         }
     }
@@ -255,6 +251,7 @@ impl Application {
         {
             let mut config = CONFIG.get().write().unwrap();
             config.track = track;
+            config.pos = 0.0;
         }
         self.load_track();
         self.on_play_or_pause(); // PLAY
