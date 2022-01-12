@@ -258,7 +258,7 @@ pub(crate) fn populate_bookmarks_menu_button(
     }
 }
 
-fn track_menu_option(index: usize, track: &std::path::PathBuf) -> String {
+fn track_menu_option(index: usize, track: &std::path::Path) -> String {
     format!(
         "&{} {}",
         A_TO_Z[index],

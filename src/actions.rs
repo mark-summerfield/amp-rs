@@ -150,7 +150,7 @@ impl Application {
             helpform.show();
         } else {
             self.helpform = Some(html_form::Form::new(
-                "Help", HELP_HTML, false, 380, 420, true,
+                "Help", HELP_HTML, false, 400, 440, true,
             ));
         }
     }
@@ -225,6 +225,7 @@ impl Application {
                     util::humanized_time(pos),
                     util::humanized_time(self.wav.length())
                 ));
+                #[allow(clippy::clone_on_copy)]
                 let sender = self.sender.clone();
                 fltk::app::add_timeout3(TINY_TIMEOUT, move |_| {
                     sender.send(Action::AddToHistory);
@@ -286,7 +287,7 @@ impl Application {
         let mut changed = false;
         if let Some(track) = track {
             let mut config = CONFIG.get().write().unwrap();
-            config.history.push_front(track.to_path_buf());
+            config.history.push_front(track);
             config.history.truncate(AUTO_MENU_SIZE);
             changed = true;
         }
@@ -337,7 +338,7 @@ impl Application {
             if config.bookmarks.len() >= AUTO_MENU_SIZE {
                 config.bookmarks.truncate(AUTO_MENU_SIZE - 1); // make room
             }
-            config.bookmarks.push(track.to_path_buf());
+            config.bookmarks.push(track);
             config.bookmarks.sort();
             changed = true;
         }
@@ -361,13 +362,10 @@ impl Application {
         let mut changed = false;
         if let Some(track) = track {
             let mut config = CONFIG.get().write().unwrap();
-            match config.bookmarks.binary_search(&track) {
-                Ok(index) => {
-                    config.bookmarks.remove(index);
-                    changed = true;
-                }
-                Err(_) => (),
-            };
+            if let Ok(index) = config.bookmarks.binary_search(&track) {
+                config.bookmarks.remove(index);
+                changed = true;
+            }
         }
         if changed {
             main_window::populate_bookmarks_menu_button(

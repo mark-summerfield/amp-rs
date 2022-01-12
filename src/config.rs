@@ -40,10 +40,10 @@ impl Config {
                 read_track_properties(properties, &mut config);
             }
             if let Some(properties) = ini.section(Some(HISTORY_SECTION)) {
-                read_history(&properties, &mut config.history);
+                read_history(properties, &mut config.history);
             }
             if let Some(properties) = ini.section(Some(BOOKMARK_SECTION)) {
-                read_bookmarks(&properties, &mut config.bookmarks);
+                read_bookmarks(properties, &mut config.bookmarks);
             }
         }
         config
