@@ -37,8 +37,6 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
         fltk::app::screen_size().0 as i32,
         fltk::app::screen_size().1 as i32,
     );
-    let size = ((TOOLBUTTON_SIZE * 4) / 3) * 6;
-    main_window.size_range(size, size, size * 4, size * 4);
     main_window.make_resizable(true);
     let mut vbox = fltk::group::Flex::default()
         .size_of_parent()
