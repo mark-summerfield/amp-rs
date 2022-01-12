@@ -303,10 +303,52 @@ impl Application {
         let index = self.history_menu_button.value();
         if index > -1 {
             if let Some(track) = self.history_menu_button.text(index) {
-                let track = track.replace(PATH_SEP, "/");
-                let (_, track) = track.split_at(3);
-                self.auto_play_track(std::path::PathBuf::from(track));
+                self.load_remembered_track(&track);
             }
         }
     }
+
+    pub(crate) fn on_load_bookmarked_track(&mut self) {
+        let index = self.bookmarks_menu_button.value();
+        if index > -1 {
+            if let Some(track) = self.bookmarks_menu_button.text(index) {
+                self.load_remembered_track(&track);
+            }
+        }
+    }
+
+    fn load_remembered_track(&mut self, track: &str) {
+        let track = track.replace(PATH_SEP, "/");
+        let (_, track) = track.split_at(3);
+        self.auto_play_track(std::path::PathBuf::from(track));
+    }
+
+    pub(crate) fn on_add_bookmark(&mut self) {
+        let track = {
+            let config = CONFIG.get().read().unwrap();
+            if config.bookmarks.contains(&config.track) {
+                None
+            } else {
+                Some(config.track.clone())
+            }
+        };
+        let mut changed = false;
+        if let Some(track) = track {
+            let mut config = CONFIG.get().write().unwrap();
+            if config.bookmarks.len() >= AUTO_MENU_SIZE {
+                config.bookmarks.truncate(AUTO_MENU_SIZE - 1); // make room
+            }
+            config.bookmarks.push(track.to_path_buf());
+            config.bookmarks.sort();
+            changed = true;
+        }
+        if changed {
+            main_window::populate_bookmarks_menu_button(
+                &mut self.bookmarks_menu_button,
+                self.sender,
+            );
+        }
+    }
+
+    pub(crate) fn on_delete_bookmark(&mut self) {}
 }

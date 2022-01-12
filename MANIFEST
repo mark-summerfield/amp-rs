@@ -1,6 +1,3 @@
-# TODO
-# implement Remembered (unlike history, after adding, sort), then
-# repopulate menu as I do for history.
 src/main.rs
 src/config.rs
 src/application.rs

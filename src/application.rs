@@ -95,7 +95,7 @@ impl Application {
                         self.on_load_history_track()
                     }
                     Action::LoadBookmarkedTrack => {
-                        println!("LoadBookmarkedTrack") // TODO
+                        self.on_load_bookmarked_track()
                     }
                     Action::SpacePressed => self.on_space_pressed(),
                     Action::Tick => self.on_tick(),
@@ -105,8 +105,8 @@ impl Application {
                     Action::VolumeUpdate => self.on_volume_update(),
                     Action::TimeUpdate => self.on_time_update(),
                     Action::AddToHistory => self.on_add_to_history(),
-                    Action::AddBookmark => println!("AddBookmark"), // TODO
-                    Action::DeleteBookmark => println!("DeleteBookmark"),     // TODO
+                    Action::AddBookmark => self.on_add_bookmark(),
+                    Action::DeleteBookmark => self.on_delete_bookmark(),
                     Action::Options => self.on_options(),
                     Action::About => self.on_about(),
                     Action::Help => self.on_help(),

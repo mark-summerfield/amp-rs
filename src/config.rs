@@ -8,8 +8,8 @@ use crate::fixed::{
 use crate::util;
 use std::collections::VecDeque;
 
-type HistoryDeque = VecDeque<std::path::PathBuf>;
-type BookmarksVec = Vec<std::path::PathBuf>;
+type History = VecDeque<std::path::PathBuf>;
+type Bookmarks = Vec<std::path::PathBuf>;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -22,8 +22,8 @@ pub struct Config {
     pub pos: f64,
     pub track: std::path::PathBuf,
     pub filename: std::path::PathBuf,
-    pub history: HistoryDeque,
-    pub bookmarks: BookmarksVec,
+    pub history: History,
+    pub bookmarks: Bookmarks,
 }
 
 impl Config {
@@ -110,8 +110,8 @@ impl Default for Config {
             pos: 0.0,
             track: std::path::PathBuf::new(),
             filename: std::path::PathBuf::new(),
-            history: HistoryDeque::new(),
-            bookmarks: BookmarksVec::new(),
+            history: History::new(),
+            bookmarks: Bookmarks::new(),
         }
     }
 }
@@ -184,7 +184,7 @@ fn read_track_properties(
     }
 }
 
-fn read_history(properties: &ini::Properties, history: &mut HistoryDeque) {
+fn read_history(properties: &ini::Properties, history: &mut History) {
     history.clear();
     for i in 1..=AUTO_MENU_SIZE {
         let key = format!("{}{}", HISTORY_KEY, i);
@@ -199,7 +199,7 @@ fn read_history(properties: &ini::Properties, history: &mut HistoryDeque) {
 
 fn read_bookmarks(
     properties: &ini::Properties,
-    bookmarks: &mut BookmarksVec,
+    bookmarks: &mut Bookmarks,
 ) {
     bookmarks.clear();
     for i in 1..=AUTO_MENU_SIZE {

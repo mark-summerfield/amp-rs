@@ -224,7 +224,7 @@ fn add_menubutton(
     button
 }
 
-pub fn populate_history_menu_button(
+pub(crate) fn populate_history_menu_button(
     menu_button: &mut fltk::menu::MenuButton,
     sender: fltk::app::Sender<Action>,
 ) {
@@ -232,13 +232,7 @@ pub fn populate_history_menu_button(
     let config = CONFIG.get().read().unwrap();
     for (i, track) in config.history.iter().enumerate() {
         menu_button.add_emit(
-            &format!(
-                "&{} {}",
-                A_TO_Z[i],
-                track
-                    .to_string_lossy()
-                    .replace(&['\\', '/'][..], &PATH_SEP.to_string())
-            ),
+            &track_menu_option(i, track),
             fltk::enums::Shortcut::None,
             fltk::menu::MenuFlag::Normal,
             sender,
@@ -247,7 +241,7 @@ pub fn populate_history_menu_button(
     }
 }
 
-fn populate_bookmarks_menu_button(
+pub(crate) fn populate_bookmarks_menu_button(
     menu_button: &mut fltk::menu::MenuButton,
     sender: fltk::app::Sender<Action>,
 ) {
@@ -255,13 +249,23 @@ fn populate_bookmarks_menu_button(
     let config = CONFIG.get().read().unwrap();
     for (i, track) in config.bookmarks.iter().enumerate() {
         menu_button.add_emit(
-            &format!("&{} {}", A_TO_Z[i], track.to_string_lossy()),
+            &track_menu_option(i, track),
             fltk::enums::Shortcut::None,
             fltk::menu::MenuFlag::Normal,
             sender,
             Action::LoadBookmarkedTrack,
         );
     }
+}
+
+fn track_menu_option(index: usize, track: &std::path::PathBuf) -> String {
+    format!(
+        "&{} {}",
+        A_TO_Z[index],
+        track
+            .to_string_lossy()
+            .replace(&['\\', '/'][..], &PATH_SEP.to_string())
+    )
 }
 
 fn initialize_menu_button(
