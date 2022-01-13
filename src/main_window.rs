@@ -17,6 +17,7 @@ pub struct Widgets {
     pub play_pause_button: fltk::button::Button,
     pub history_menu_button: fltk::menu::MenuButton,
     pub bookmarks_menu_button: fltk::menu::MenuButton,
+    pub menu_button: fltk::menu::MenuButton,
     pub info_view: fltk::misc::HelpView,
     pub volume_slider: fltk::valuator::HorFillSlider,
     pub volume_label: fltk::frame::Frame,
@@ -52,6 +53,7 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
         play_pause_button,
         history_menu_button,
         bookmarks_menu_button,
+        menu_button,
         toolbar,
     ) = add_toolbar(sender, width);
     vbox.set_size(&toolbar, TOOLBAR_HEIGHT);
@@ -62,6 +64,7 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
         play_pause_button,
         history_menu_button,
         bookmarks_menu_button,
+        menu_button,
         info_view,
         volume_slider,
         volume_label,
@@ -84,6 +87,7 @@ fn add_toolbar(
     width: i32,
 ) -> (
     fltk::button::Button,
+    fltk::menu::MenuButton,
     fltk::menu::MenuButton,
     fltk::menu::MenuButton,
     fltk::group::Flex,
@@ -169,6 +173,7 @@ fn add_toolbar(
         play_pause_button,
         history_menu_button,
         bookmarks_menu_button,
+        menu_button,
         button_box,
     )
 }
@@ -398,6 +403,10 @@ pub fn add_event_handlers(
             }
             if fltk::app::event_key() == fltk::enums::Key::F5 {
                 sender.send(Action::Replay);
+                return true;
+            }
+            if fltk::app::event_key() == fltk::enums::Key::Menu {
+                sender.send(Action::MainMenu);
                 return true;
             }
         }

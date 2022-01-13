@@ -7,6 +7,7 @@ use std::env;
 
 pub static APPNAME: &str = "AMP";
 pub static VERSION: &str = "1.1.1";
+pub static HELP_HTML: &str = include_str!("../help.html");
 pub const ICON: &str = include_str!("../images/amp.svg");
 pub const LOAD_ICON: &str = include_str!("../images/document-open.svg");
 pub const PREV_ICON: &str =
@@ -58,6 +59,7 @@ pub enum Action {
     Load,
     LoadBookmarkedTrack,
     LoadHistoryTrack,
+    MainMenu,
     Next,
     OnStartup,
     Options,
@@ -113,47 +115,4 @@ Rust {} • fltk-rs {} • FLTK {}<br>Soloud {}/{} • {}/{}
 pub static LOAD_ERROR: &str = "
 <font color=red><b>Error</b><br>Failed to open</font>
 <font color=magenta>\"FILE\".</font>
-</body>";
-
-pub static HELP_HTML: &str = "<body>
-<p><center><font color=navy size=6><b>AMP</b></font></center></p>
-<p><center><font color=blue size=5>“Another Music Player‟</font>
-</center></p>
-<font color=blue>
-<p>
-Another Music Player provides a basic but useful example of Rust/FLTK and
-the Soloud sound library.
-</p>
-<p>
-It should be especially handy for audio books since at startup it restores
-the last played track at the exact position it had reached. And when the end
-of a track is reached, the next track in the same folder is automatically
-played (if there is one).
-</p>
-<p>
-Click the volume slider to change the volume (or press the <b>+</b> or
-<b>-</b> keys). Similarly, click the time slider to change the position in the currently playing track.
-</p>
-</font>
-<p>
-<table border=1 align=center>
-<font color=green>
-<tr><th>Key</th><th>Action</th></tr>
-<tr><td><b>Space</b> or <b>p</b> </td><td>Play or Pause the current
-track</td></tr>
-<tr><td><b>Esc</b></td><td>Quit</td></tr>
-<tr><td><b>-</b></td><td>Reduce the volume</td></tr>
-<tr><td><b>+</b> or <b>=</b></td><td>Increase the volume</td></tr>
-<tr><td><b>F4</b></td><td>Start playing the previous track (if
-any)</td></tr>
-<tr><td><b>F5</b> or <b>r</b></td><td>Replay the current track from the
-beginning</td></tr>
-<tr><td><b>F6</b></td><td>Start playing the next track (if any)</td></tr>
-<tr><td><b>a</b></td><td>Add the current track to the bookmarks menu</td></tr>
-<tr><td><b>b</b></td><td>Pop up the bookmarks menu (initially empty)</td></tr>
-<tr><td><b>d</b></td><td>Delete the current track from the bookmarks menu</td></tr>
-<tr><td><b>m</b></td><td>Pop up the main menu</td></tr>
-<tr><td><b>o</b></td><td>Open a track and start playing it</td></tr>
-</font>
-</table>
 </body>";

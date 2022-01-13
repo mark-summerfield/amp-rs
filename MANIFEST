@@ -11,6 +11,7 @@ src/util.rs
 Cargo.toml
 
 README.md
+help.html
 st.sh
 
 deploy.sh

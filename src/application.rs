@@ -13,6 +13,7 @@ pub struct Application {
     pub(crate) play_pause_button: fltk::button::Button,
     pub(crate) history_menu_button: fltk::menu::MenuButton,
     pub(crate) bookmarks_menu_button: fltk::menu::MenuButton,
+    pub(crate) menu_button: fltk::menu::MenuButton,
     pub(crate) info_view: fltk::misc::HelpView,
     pub(crate) volume_slider: fltk::valuator::HorFillSlider,
     pub(crate) volume_label: fltk::frame::Frame,
@@ -48,6 +49,7 @@ impl Application {
             play_pause_button: widgets.play_pause_button,
             history_menu_button: widgets.history_menu_button,
             bookmarks_menu_button: widgets.bookmarks_menu_button,
+            menu_button: widgets.menu_button,
             info_view: widgets.info_view,
             volume_slider: widgets.volume_slider,
             volume_label: widgets.volume_label,
@@ -99,6 +101,9 @@ impl Application {
                     }
                     Action::SpacePressed => self.on_space_pressed(),
                     Action::Tick => self.on_tick(),
+                    Action::MainMenu => {
+                        self.menu_button.popup();
+                    }
                     Action::Next => self.on_next(),
                     Action::VolumeDown => self.on_volume_down(),
                     Action::VolumeUp => self.on_volume_up(),
