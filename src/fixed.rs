@@ -7,28 +7,27 @@ use std::env;
 
 pub static APPNAME: &str = "AMP";
 pub static VERSION: &str = "1.2.0";
-pub static HELP_HTML: &str = include_str!("../data/help.html");
-pub const ICON: &str = include_str!("../data/amp.svg");
-pub const LOAD_ICON: &str = include_str!("../data/document-open.svg");
+pub const ICON: &str = include_str!("../images/amp.svg");
+pub const LOAD_ICON: &str = include_str!("../images/document-open.svg");
 pub const PREV_ICON: &str =
-    include_str!("../data/media-seek-backward.svg");
-pub const REPLAY_ICON: &str = include_str!("../data/replay.svg");
+    include_str!("../images/media-seek-backward.svg");
+pub const REPLAY_ICON: &str = include_str!("../images/replay.svg");
 pub const PLAY_ICON: &str =
-    include_str!("../data/media-playback-start.svg");
+    include_str!("../images/media-playback-start.svg");
 pub const PAUSE_ICON: &str =
-    include_str!("../data/media-playback-pause.svg");
+    include_str!("../images/media-playback-pause.svg");
 pub const NEXT_ICON: &str =
-    include_str!("../data/media-seek-forward.svg");
+    include_str!("../images/media-seek-forward.svg");
 pub const VOLUME_ICON: &str =
-    include_str!("../data/audio-volume-high.svg");
-pub const TIME_ICON: &str = include_str!("../data/time.svg");
-pub const HISTORY_ICON: &str = include_str!("../data/history.svg");
-pub const BOOKMARKS_ICON: &str = include_str!("../data/bookmarks.svg");
+    include_str!("../images/audio-volume-high.svg");
+pub const TIME_ICON: &str = include_str!("../images/time.svg");
+pub const HISTORY_ICON: &str = include_str!("../images/history.svg");
+pub const BOOKMARKS_ICON: &str = include_str!("../images/bookmarks.svg");
 pub const ADD_BOOKMARK_ICON: &str =
-    include_str!("../data/addbookmark.svg");
+    include_str!("../images/addbookmark.svg");
 pub const DELETE_BOOKMARK_ICON: &str =
-    include_str!("../data/deletebookmark.svg");
-pub const MENU_ICON: &str = include_str!("../data/menu.svg");
+    include_str!("../images/deletebookmark.svg");
+pub const MENU_ICON: &str = include_str!("../images/menu.svg");
 pub const DEF_HISTORY_SIZE: usize = 26;
 pub const MIN_HISTORY_SIZE: usize = 2;
 pub const MAX_HISTORY_SIZE: usize = 35;
@@ -121,4 +120,57 @@ Rust {} • fltk-rs {} • FLTK {}<br>Soloud {}/{} • {}/{}
 pub static LOAD_ERROR: &str = "
 <font color=red><b>Error</b><br>Failed to open</font>
 <font color=magenta>\"FILE\".</font>
+</body>";
+
+pub static HELP_HTML: &str = "<body>
+<p><center><font color=navy size=6><b>AMP</b></font></center></p>
+<p><center><font color=blue size=5>“Another Music Player‟</font>
+</center></p>
+<font color=blue>
+<p>
+Another Music Player provides a basic but useful example of Rust/FLTK and
+the Soloud sound library.
+</p>
+<p>
+It should be especially handy for audio books since at startup it restores
+the last played track at the exact position it had reached. And when the end
+of a track is reached, the next track in the same folder is automatically
+played (if there is one).
+</p>
+<p>
+Click the volume slider to change the volume (or press the <b>+</b> or
+<b>-</b> keys). Similarly, click the time slider to change the position
+in the currently playing track.
+</p>
+</font>
+<p>
+<table border=1 align=center>
+<font color=green>
+<tr><th>Key</th><th>Action</th></tr>
+<tr><td><b>Space</b> or <b>p</b> </td><td>Play or Pause the current
+track</td></tr>
+<tr><td><b>Esc</b></td><td>Quit</td></tr>
+<tr><td><b>-</b></td><td>Reduce the volume</td></tr>
+<tr><td><b>+</b> or <b>=</b></td><td>Increase the volume</td></tr>
+<tr><td><b>F4</b></td><td>Start playing the previous track (if
+any)</td></tr>
+<tr><td><b>F5</b> or <b>r</b></td><td>Replay the current track from the
+beginning</td></tr>
+<tr><td><b>F6</b></td><td>Start playing the next track (if any)</td></tr>
+<tr><td><b>a</b></td><td>Add the current track to the bookmarks menu</td></tr>
+<tr><td><b>b</b></td><td>Pop up the bookmarks menu (initially empty)</td></tr>
+<tr><td><b>d</b></td><td>Delete the current track from the bookmarks menu</td></tr>
+<tr><td><b>h</b></td><td>Pop up the history menu (initially empty)</td></tr>
+<tr><td><b>m</b> or <b>Menu</b></td><td>Pop up the main menu</td></tr>
+<tr><td><b>o</b></td><td>Open a track and start playing it</td></tr>
+</font>
+</table>
+</p>
+<font color=blue>
+<p>
+The main menu can be used to show the Options dialog. This dialog can be
+used to set the scale of the user interface, and to set how many tracks
+may appear in the history menu.
+</p>
+</font>
 </body>";
