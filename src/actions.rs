@@ -247,7 +247,7 @@ impl Application {
             }
         };
         self.info_view.set_value(&message);
-        // self.update_ui(); // TODO if implemented
+        self.update_ui();
         fltk::app::redraw(); // redraws the world
     }
 

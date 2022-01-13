@@ -249,7 +249,6 @@ pub(crate) fn populate_history_menu_button(
             Action::LoadHistoryTrack,
         );
     }
-    // self.update_ui(); // TODO if implemented
 }
 
 fn get_menu_chars(length: usize) -> Vec<char> {
@@ -278,7 +277,6 @@ pub(crate) fn populate_bookmarks_menu_button(
             Action::LoadBookmarkedTrack,
         );
     }
-    // self.update_ui(); // TODO if implemented
 }
 
 fn track_menu_option(c: char, track: &std::path::Path) -> String {

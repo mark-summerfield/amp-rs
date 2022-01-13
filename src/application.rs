@@ -1,7 +1,7 @@
 // Copyright © 2021-22 Mark Summerfield. All rights reserved.
 // License: GPLv3
 
-// use super::CONFIG;
+use super::CONFIG;
 use crate::fixed::Action;
 use crate::html_form;
 use crate::main_window;
@@ -127,7 +127,7 @@ impl Application {
             &mut self.history_menu_button,
             self.sender,
         );
-        // self.update_ui(); // TODO if implemented
+        self.update_ui();
     }
 
     pub fn populate_bookmarks_menu_button(&mut self) {
@@ -135,16 +135,19 @@ impl Application {
             &mut self.bookmarks_menu_button,
             self.sender,
         );
-        // self.update_ui(); // TODO if implemented
+        self.update_ui();
     }
 
-    /* TODO if it is possible to enable/disable widgets
     pub fn update_ui(&mut self) {
         let (has_track, has_history, has_bookmarks) = {
             let config = CONFIG.get().read().unwrap();
-            (config.track.exists(), config.history.len() > 0,
-             config.bookmarks.len() > 0)
+            (
+                config.track.exists(),
+                config.history.len() > 0,
+                config.bookmarks.len() > 0,
+            )
         };
+        /*
         if has_track { // ENABLE
             self.play_pause_button
             self.replay_button
@@ -172,6 +175,6 @@ impl Application {
             self.bookmarks_menu_button
             self.delete_bookmark_button
         }
+        */
     }
-    */
 }
