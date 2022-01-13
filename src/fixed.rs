@@ -6,7 +6,7 @@ use chrono::prelude::*;
 use std::env;
 
 pub static APPNAME: &str = "AMP";
-pub static VERSION: &str = "1.1.1";
+pub static VERSION: &str = "1.2.0";
 pub static HELP_HTML: &str = include_str!("../help.html");
 pub const ICON: &str = include_str!("../images/amp.svg");
 pub const LOAD_ICON: &str = include_str!("../images/document-open.svg");
@@ -29,7 +29,9 @@ pub const ADD_BOOKMARK_ICON: &str =
 pub const DELETE_BOOKMARK_ICON: &str =
     include_str!("../images/deletebookmark.svg");
 pub const MENU_ICON: &str = include_str!("../images/menu.svg");
-pub const HISTORY_SIZE: usize = 26;
+pub const DEF_HISTORY_SIZE: usize = 26;
+pub const MIN_HISTORY_SIZE: usize = 2;
+pub const MAX_HISTORY_SIZE: usize = 35;
 pub const BOOKMARKS_SIZE: usize = 35;
 pub const PAD: i32 = 6;
 pub const WINDOW_WIDTH_MIN: i32 = 480;
@@ -42,10 +44,11 @@ pub const SCALE_MIN: f32 = 0.5;
 pub const SCALE_MAX: f32 = 3.5;
 pub const TINY_TIMEOUT: f64 = 0.075;
 pub const TICK_TIMEOUT: f64 = 0.1;
-pub static MENU_CHARS: [char; 35] = [
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
-    'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
-    'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+pub static MENU_DIGITS: [char; 9] =
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+pub static MENU_LETTERS: [char; 26] = [
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+    'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
 pub const PATH_SEP: char = '→';
 

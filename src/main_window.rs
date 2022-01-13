@@ -4,10 +4,10 @@
 use super::CONFIG;
 use crate::fixed::{
     Action, ADD_BOOKMARK_ICON, APPNAME, BOOKMARKS_ICON, BUTTON_HEIGHT,
-    DELETE_BOOKMARK_ICON, HISTORY_ICON, ICON, LOAD_ICON, MENU_CHARS,
-    MENU_ICON, NEXT_ICON, PAD, PATH_SEP, PLAY_ICON, PREV_ICON, REPLAY_ICON,
-    TIME_ICON, TOOLBAR_HEIGHT, TOOLBUTTON_SIZE, VOLUME_ICON,
-    WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
+    DELETE_BOOKMARK_ICON, HISTORY_ICON, ICON, LOAD_ICON, MENU_DIGITS,
+    MENU_ICON, MENU_LETTERS, NEXT_ICON, PAD, PATH_SEP, PLAY_ICON,
+    PREV_ICON, REPLAY_ICON, TIME_ICON, TOOLBAR_HEIGHT, TOOLBUTTON_SIZE,
+    VOLUME_ICON, WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
 };
 use crate::util;
 use fltk::prelude::*;
@@ -235,14 +235,30 @@ pub(crate) fn populate_history_menu_button(
 ) {
     menu_button.clear();
     let config = CONFIG.get().read().unwrap();
+    let size = config.history_size;
+    let chars = get_menu_chars(config.history.len().min(size));
     for (i, track) in config.history.iter().enumerate() {
+        if i == size {
+            break;
+        }
         menu_button.add_emit(
-            &track_menu_option(i, track),
+            &track_menu_option(chars[i], track),
             fltk::enums::Shortcut::None,
             fltk::menu::MenuFlag::Normal,
             sender,
             Action::LoadHistoryTrack,
         );
+    }
+    // self.update_ui(); // TODO if implemented
+}
+
+fn get_menu_chars(length: usize) -> Vec<char> {
+    if length < 10 {
+        MENU_DIGITS.iter().map(|c| *c).collect()
+    } else if length < 27 {
+        MENU_LETTERS.iter().map(|c| *c).collect()
+    } else {
+        MENU_DIGITS.iter().chain(MENU_LETTERS.iter()).map(|c| *c).collect()
     }
 }
 
@@ -252,21 +268,23 @@ pub(crate) fn populate_bookmarks_menu_button(
 ) {
     menu_button.clear();
     let config = CONFIG.get().read().unwrap();
+    let chars = get_menu_chars(config.bookmarks.len());
     for (i, track) in config.bookmarks.iter().enumerate() {
         menu_button.add_emit(
-            &track_menu_option(i, track),
+            &track_menu_option(chars[i], track),
             fltk::enums::Shortcut::None,
             fltk::menu::MenuFlag::Normal,
             sender,
             Action::LoadBookmarkedTrack,
         );
     }
+    // self.update_ui(); // TODO if implemented
 }
 
-fn track_menu_option(index: usize, track: &std::path::Path) -> String {
+fn track_menu_option(c: char, track: &std::path::Path) -> String {
     format!(
         "&{} {}",
-        MENU_CHARS[index],
+        c,
         track
             .to_string_lossy()
             .replace(&['\\', '/'][..], &PATH_SEP.to_string())

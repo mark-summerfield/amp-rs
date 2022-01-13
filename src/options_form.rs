@@ -3,7 +3,8 @@
 
 use super::CONFIG;
 use crate::fixed::{
-    APPNAME, BUTTON_HEIGHT, BUTTON_WIDTH, ICON, PAD, SCALE_MAX, SCALE_MIN,
+    APPNAME, BUTTON_HEIGHT, BUTTON_WIDTH, DEF_HISTORY_SIZE, ICON,
+    MAX_HISTORY_SIZE, MIN_HISTORY_SIZE, PAD, SCALE_MAX, SCALE_MIN,
 };
 use crate::util;
 use fltk::prelude::*;
@@ -36,7 +37,7 @@ impl Form {
             &mut buttons,
             Rc::clone(&ok),
         );
-        spinners.scale_spinner.take_focus().unwrap();
+        spinners.history_size_spinner.take_focus().unwrap();
         form.show();
         while form.shown() {
             fltk::app::wait();
@@ -52,6 +53,7 @@ impl Drop for Form {
 }
 
 struct Spinners {
+    pub history_size_spinner: fltk::misc::Spinner,
     pub scale_spinner: fltk::misc::Spinner,
 }
 
@@ -88,6 +90,14 @@ fn make_config_row() {
 
 fn make_spinners() -> Spinners {
     let config = CONFIG.get().read().unwrap();
+    let history_size_spinner = make_row(
+        "&History Size",
+        config.history_size as f64,
+        &format!("The maximum number of tracks to keep in the history menu (default {})", DEF_HISTORY_SIZE),
+        MIN_HISTORY_SIZE as f64,
+        MAX_HISTORY_SIZE as f64,
+        1.0,
+    );
     let scale_spinner = make_row(
         "&Scale",
         config.window_scale as f64,
@@ -96,7 +106,7 @@ fn make_spinners() -> Spinners {
         SCALE_MAX as f64,
         0.1,
     );
-    Spinners { scale_spinner }
+    Spinners { history_size_spinner, scale_spinner }
 }
 
 fn make_row(
@@ -150,17 +160,18 @@ fn add_event_handlers(
     ok: Rc<RefCell<bool>>,
 ) {
     buttons.ok_button.set_callback({
+        let history_size_spinner = spinners.history_size_spinner.clone();
         let scale_spinner = spinners.scale_spinner.clone();
         let mut form = form.clone();
         move |_| {
             *ok.borrow_mut() = true;
             let mut config = CONFIG.get().write().unwrap();
-            let old_scale = config.window_scale;
-            let new_scale = scale_spinner.value() as f32;
-            if !util::isclose32(old_scale, new_scale) {
-                config.window_scale = new_scale;
-                fltk::app::set_screen_scale(0, new_scale);
+            let scale = scale_spinner.value() as f32;
+            if !util::isclose32(config.window_scale, scale) {
+                config.window_scale = scale;
+                fltk::app::set_screen_scale(0, scale);
             }
+            config.history_size = history_size_spinner.value() as usize;
             form.hide();
         }
     });

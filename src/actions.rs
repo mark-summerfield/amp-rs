@@ -4,9 +4,9 @@
 use super::CONFIG;
 use crate::application::Application;
 use crate::fixed::{
-    about_html, Action, APPNAME, BOOKMARKS_SIZE, HELP_HTML, HISTORY_SIZE,
-    LOAD_ERROR, PATH_SEP, PAUSE_ICON, PLAY_ICON, TICK_TIMEOUT,
-    TINY_TIMEOUT, TOOLBUTTON_SIZE,
+    about_html, Action, APPNAME, BOOKMARKS_SIZE, HELP_HTML, LOAD_ERROR,
+    PATH_SEP, PAUSE_ICON, PLAY_ICON, TICK_TIMEOUT, TINY_TIMEOUT,
+    TOOLBUTTON_SIZE,
 };
 use crate::html_form;
 use crate::main_window;
@@ -127,7 +127,21 @@ impl Application {
     }
 
     pub(crate) fn on_options(&mut self) {
-        options_form::Form::default();
+        let old_size = {
+            let config = CONFIG.get().read().unwrap();
+            config.history_size
+        };
+        let form = options_form::Form::default();
+        let ok = *form.ok.borrow();
+        if ok {
+            let new_size = {
+                let config = CONFIG.get().read().unwrap();
+                config.history_size
+            };
+            if old_size != new_size {
+                self.populate_history_menu_button();
+            }
+        }
     }
 
     pub(crate) fn on_about(&mut self) {
@@ -233,6 +247,7 @@ impl Application {
             }
         };
         self.info_view.set_value(&message);
+        // self.update_ui(); // TODO if implemented
         fltk::app::redraw(); // redraws the world
     }
 
@@ -273,19 +288,19 @@ impl Application {
     }
 
     pub(crate) fn on_add_to_history(&mut self) {
-        let track = {
+        let (track, size) = {
             let config = CONFIG.get().read().unwrap();
             if config.history.contains(&config.track) {
-                None
+                (None, config.history_size)
             } else {
-                Some(config.track.clone())
+                (Some(config.track.clone()), config.history_size)
             }
         };
         let mut changed = false;
         if let Some(track) = track {
             let mut config = CONFIG.get().write().unwrap();
             config.history.push_front(track);
-            config.history.truncate(HISTORY_SIZE);
+            config.history.truncate(size);
             changed = true;
         }
         if changed {
@@ -340,10 +355,7 @@ impl Application {
             changed = true;
         }
         if changed {
-            main_window::populate_bookmarks_menu_button(
-                &mut self.bookmarks_menu_button,
-                self.sender,
-            );
+            self.populate_bookmarks_menu_button();
         }
     }
 
@@ -365,10 +377,7 @@ impl Application {
             }
         }
         if changed {
-            main_window::populate_bookmarks_menu_button(
-                &mut self.bookmarks_menu_button,
-                self.sender,
-            );
+            self.opulate_bookmarks_menu_button();
         }
     }
 }

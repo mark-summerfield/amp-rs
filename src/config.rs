@@ -2,8 +2,9 @@
 // License: GPLv3
 
 use crate::fixed::{
-    APPNAME, BOOKMARKS_SIZE, HISTORY_SIZE, SCALE_MAX, SCALE_MIN,
-    WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
+    APPNAME, BOOKMARKS_SIZE, DEF_HISTORY_SIZE, MAX_HISTORY_SIZE,
+    MIN_HISTORY_SIZE, SCALE_MAX, SCALE_MIN, WINDOW_HEIGHT_MIN,
+    WINDOW_WIDTH_MIN,
 };
 use crate::util;
 use std::collections::VecDeque;
@@ -22,6 +23,7 @@ pub struct Config {
     pub pos: f64,
     pub track: std::path::PathBuf,
     pub filename: std::path::PathBuf,
+    pub history_size: usize,
     pub history: History,
     pub bookmarks: Bookmarks,
 }
@@ -40,10 +42,10 @@ impl Config {
                 read_track_properties(properties, &mut config);
             }
             if let Some(properties) = ini.section(Some(HISTORY_SECTION)) {
-                read_history(properties, &mut config.history);
+                read_history(properties, &mut config);
             }
             if let Some(properties) = ini.section(Some(BOOKMARK_SECTION)) {
-                read_bookmarks(properties, &mut config.bookmarks);
+                read_bookmarks(properties, &mut config);
             }
         }
         config
@@ -64,6 +66,8 @@ impl Config {
                 .set(VOLUME_KEY, self.volume.to_string())
                 .set(POS_KEY, self.pos.to_string())
                 .set(TRACK_KEY, self.track.to_string_lossy());
+            ini.with_section(Some(HISTORY_SECTION))
+                .set(HISTORY_SIZE_KEY, self.history_size.to_string());
             self.save_history(&mut ini);
             self.save_bookmarks(&mut ini);
             match ini.write_to_file(&self.filename) {
@@ -110,6 +114,7 @@ impl Default for Config {
             pos: 0.0,
             track: std::path::PathBuf::new(),
             filename: std::path::PathBuf::new(),
+            history_size: DEF_HISTORY_SIZE,
             history: History::new(),
             bookmarks: Bookmarks::new(),
         }
@@ -184,27 +189,35 @@ fn read_track_properties(
     }
 }
 
-fn read_history(properties: &ini::Properties, history: &mut History) {
-    history.clear();
-    for i in 1..=HISTORY_SIZE {
+fn read_history(properties: &ini::Properties, config: &mut Config) {
+    if let Some(value) = properties.get(HISTORY_SIZE_KEY) {
+        config.history_size = util::get_num(
+            value,
+            MIN_HISTORY_SIZE,
+            MAX_HISTORY_SIZE,
+            config.history_size,
+        )
+    }
+    config.history.clear();
+    for i in 1..=config.history_size {
         let key = format!("{}{}", HISTORY_KEY, i);
         if let Some(value) = properties.get(&key) {
             let value = std::path::PathBuf::from(value);
-            if !history.contains(&value) && value.exists() {
-                history.push_back(value);
+            if !config.history.contains(&value) && value.exists() {
+                config.history.push_back(value);
             }
         }
     }
 }
 
-fn read_bookmarks(properties: &ini::Properties, bookmarks: &mut Bookmarks) {
-    bookmarks.clear();
+fn read_bookmarks(properties: &ini::Properties, config: &mut Config) {
+    config.bookmarks.clear();
     for i in 1..=BOOKMARKS_SIZE {
         let key = format!("{}{}", BOOKMARK_KEY, i);
         if let Some(value) = properties.get(&key) {
             let value = std::path::PathBuf::from(value);
-            if !bookmarks.contains(&value) && value.exists() {
-                bookmarks.push(value);
+            if !config.bookmarks.contains(&value) && value.exists() {
+                config.bookmarks.push(value);
             }
         }
     }
@@ -221,6 +234,7 @@ static VOLUME_KEY: &str = "volume";
 static POS_KEY: &str = "pos";
 static TRACK_KEY: &str = "track";
 static HISTORY_SECTION: &str = "History";
+static HISTORY_SIZE_KEY: &str = "size";
 static HISTORY_KEY: &str = "history";
 static BOOKMARK_SECTION: &str = "Boomarks";
 static BOOKMARK_KEY: &str = "boomark";

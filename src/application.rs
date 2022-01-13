@@ -1,6 +1,7 @@
 // Copyright © 2021-22 Mark Summerfield. All rights reserved.
 // License: GPLv3
 
+use super::CONFIG;
 use crate::fixed::Action;
 use crate::html_form;
 use crate::main_window;
@@ -120,4 +121,57 @@ impl Application {
             }
         }
     }
+
+    pub fn populate_history_menu_button(&mut self) {
+        main_window::populate_history_menu_button(
+            &mut self.history_menu_button,
+            self.sender,
+        );
+        // self.update_ui(); // TODO if implemented
+    }
+
+    pub fn populate_bookmarks_menu_button(&mut self) {
+        main_window::populate_bookmarks_menu_button(
+            &mut self.bookmarks_menu_button,
+            self.sender,
+        );
+        // self.update_ui(); // TODO if implemented
+    }
+
+    /* TODO if it is possible to enable/disable widgets
+    pub fn update_ui(&mut self) {
+        let (has_track, has_history, has_bookmarks) = {
+            let config = CONFIG.get().read().unwrap();
+            (config.track.exists(), config.history.len() > 0,
+             config.bookmarks.len() > 0)
+        };
+        if has_track { // ENABLE
+            self.play_pause_button
+            self.replay_button
+            self.prev_button
+            self.next_button
+            self.time_slider
+            self.add_bookmark_button
+        } else { // DISABLE
+            self.play_pause_button
+            self.replay_button
+            self.prev_button
+            self.next_button
+            self.time_slider
+            self.add_bookmark_button
+        }
+        if has_history { // ENABLE
+            self.history_menu_button
+        } else { // DISABLE
+            self.history_menu_button
+        }
+        if has_bookmarks { // ENABLE
+            self.bookmarks_menu_button
+            self.delete_bookmark_button
+        } else { // DISABLE
+            self.bookmarks_menu_button
+            self.delete_bookmark_button
+        }
+    }
+    */
 }
