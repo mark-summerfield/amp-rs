@@ -7,28 +7,28 @@ use std::env;
 
 pub static APPNAME: &str = "AMP";
 pub static VERSION: &str = "1.2.0";
-pub static HELP_HTML: &str = include_str!("../data/help.html");
-pub const ICON: &str = include_str!("../data/amp.svg");
-pub const LOAD_ICON: &str = include_str!("../data/document-open.svg");
+pub static HELP_HTML: &str = include_str!("data/help.html");
+pub const ICON: &str = include_str!("data/amp.svg");
+pub const LOAD_ICON: &str = include_str!("data/document-open.svg");
 pub const PREV_ICON: &str =
-    include_str!("../data/media-seek-backward.svg");
-pub const REPLAY_ICON: &str = include_str!("../data/replay.svg");
+    include_str!("data/media-seek-backward.svg");
+pub const REPLAY_ICON: &str = include_str!("data/replay.svg");
 pub const PLAY_ICON: &str =
-    include_str!("../data/media-playback-start.svg");
+    include_str!("data/media-playback-start.svg");
 pub const PAUSE_ICON: &str =
-    include_str!("../data/media-playback-pause.svg");
+    include_str!("data/media-playback-pause.svg");
 pub const NEXT_ICON: &str =
-    include_str!("../data/media-seek-forward.svg");
+    include_str!("data/media-seek-forward.svg");
 pub const VOLUME_ICON: &str =
-    include_str!("../data/audio-volume-high.svg");
-pub const TIME_ICON: &str = include_str!("../data/time.svg");
-pub const HISTORY_ICON: &str = include_str!("../data/history.svg");
-pub const BOOKMARKS_ICON: &str = include_str!("../data/bookmarks.svg");
+    include_str!("data/audio-volume-high.svg");
+pub const TIME_ICON: &str = include_str!("data/time.svg");
+pub const HISTORY_ICON: &str = include_str!("data/history.svg");
+pub const BOOKMARKS_ICON: &str = include_str!("data/bookmarks.svg");
 pub const ADD_BOOKMARK_ICON: &str =
-    include_str!("../data/addbookmark.svg");
+    include_str!("data/addbookmark.svg");
 pub const DELETE_BOOKMARK_ICON: &str =
-    include_str!("../data/deletebookmark.svg");
-pub const MENU_ICON: &str = include_str!("../data/menu.svg");
+    include_str!("data/deletebookmark.svg");
+pub const MENU_ICON: &str = include_str!("data/menu.svg");
 pub const DEF_HISTORY_SIZE: usize = 26;
 pub const MIN_HISTORY_SIZE: usize = 2;
 pub const MAX_HISTORY_SIZE: usize = 35;
