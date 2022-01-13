@@ -158,38 +158,36 @@ impl Application {
             let config = CONFIG.get().read().unwrap();
             (
                 config.track.exists(),
-                config.history.len() > 0,
-                config.bookmarks.len() > 0,
+                !config.history.is_empty(),
+                !config.bookmarks.is_empty(),
             )
         };
-        let button_trigger = fltk::enums::CallbackTrigger::Release;
-        let no_trigger = fltk::enums::CallbackTrigger::Never;
-        let trigger = if has_track { button_trigger } else { no_trigger };
-        self.prev_button.set_trigger(trigger);
-        self.replay_button.set_trigger(trigger);
-        self.play_pause_button.set_trigger(trigger);
-        self.next_button.set_trigger(trigger);
         if has_track {
-            self.time_slider
-                .set_trigger(fltk::enums::CallbackTrigger::Changed);
+            self.prev_button.activate();
+            self.replay_button.activate();
+            self.play_pause_button.activate();
+            self.next_button.activate();
+            self.time_slider.activate();
+            self.add_bookmark_button.activate();
         } else {
-            self.time_slider.set_trigger(no_trigger);
+            self.prev_button.deactivate();
+            self.replay_button.deactivate();
+            self.play_pause_button.deactivate();
+            self.next_button.deactivate();
+            self.time_slider.deactivate();
+            self.add_bookmark_button.deactivate();
         }
-        self.add_bookmark_button.set_trigger(trigger);
-        let menu_trigger = fltk::enums::CallbackTrigger::NotChanged
-            | fltk::enums::CallbackTrigger::Release
-            | fltk::enums::CallbackTrigger::ReleaseAlways;
         if has_history {
-            self.history_menu_button.set_trigger(menu_trigger);
+            self.history_menu_button.activate();
         } else {
-            self.history_menu_button.set_trigger(no_trigger);
+            self.history_menu_button.deactivate();
         }
         if has_bookmarks {
-            self.bookmarks_menu_button.set_trigger(menu_trigger);
-            self.delete_bookmark_button.set_trigger(button_trigger);
+            self.bookmarks_menu_button.activate();
+            self.delete_bookmark_button.activate();
         } else {
-            self.bookmarks_menu_button.set_trigger(no_trigger);
-            self.delete_bookmark_button.set_trigger(no_trigger);
+            self.bookmarks_menu_button.deactivate();
+            self.delete_bookmark_button.deactivate();
         }
     }
 }

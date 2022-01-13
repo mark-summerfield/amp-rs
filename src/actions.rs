@@ -306,7 +306,7 @@ impl Application {
     pub(crate) fn on_bookmark_menu(&mut self) {
         {
             let config = CONFIG.get().read().unwrap();
-            if config.bookmarks.len() == 0 {
+            if config.bookmarks.is_empty() {
                 return;
             }
         }
@@ -316,7 +316,7 @@ impl Application {
     pub(crate) fn on_history_menu(&mut self) {
         {
             let config = CONFIG.get().read().unwrap();
-            if config.history.len() == 0 {
+            if config.history.is_empty() {
                 return;
             }
         }

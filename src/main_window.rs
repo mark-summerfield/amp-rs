@@ -257,7 +257,7 @@ fn add_menubutton(
     let mut icon = fltk::image::SvgImage::from_data(icon).unwrap();
     icon.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
     button.set_image(Some(icon));
-    button.handle(move |button, event| {
+    button.handle(move |_, event| {
         if event == fltk::enums::Event::KeyUp
             && fltk::app::event_key().bits() == codepoint
         {
@@ -294,11 +294,11 @@ pub(crate) fn populate_history_menu_button(
 
 fn get_menu_chars(length: usize) -> Vec<char> {
     if length < 10 {
-        MENU_DIGITS.iter().map(|c| *c).collect()
+        MENU_DIGITS.iter().copied().collect()
     } else if length < 27 {
-        MENU_LETTERS.iter().map(|c| *c).collect()
+        MENU_LETTERS.iter().copied().collect()
     } else {
-        MENU_DIGITS.iter().chain(MENU_LETTERS.iter()).map(|c| *c).collect()
+        MENU_DIGITS.iter().chain(MENU_LETTERS.iter()).copied().collect()
     }
 }
 
