@@ -377,7 +377,7 @@ impl Application {
             }
         }
         if changed {
-            self.opulate_bookmarks_menu_button();
+            self.populate_bookmarks_menu_button();
         }
     }
 }

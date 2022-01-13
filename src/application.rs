@@ -1,7 +1,7 @@
 // Copyright © 2021-22 Mark Summerfield. All rights reserved.
 // License: GPLv3
 
-use super::CONFIG;
+// use super::CONFIG;
 use crate::fixed::Action;
 use crate::html_form;
 use crate::main_window;
