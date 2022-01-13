@@ -11,9 +11,14 @@ use soloud::prelude::*;
 pub struct Application {
     pub(crate) app: fltk::app::App,
     pub(crate) main_window: fltk::window::Window,
+    pub(crate) prev_button: fltk::button::Button,
+    pub(crate) replay_button: fltk::button::Button,
     pub(crate) play_pause_button: fltk::button::Button,
+    pub(crate) next_button: fltk::button::Button,
     pub(crate) history_menu_button: fltk::menu::MenuButton,
     pub(crate) bookmarks_menu_button: fltk::menu::MenuButton,
+    pub(crate) add_bookmark_button: fltk::button::Button,
+    pub(crate) delete_bookmark_button: fltk::button::Button,
     pub(crate) menu_button: fltk::menu::MenuButton,
     pub(crate) info_view: fltk::misc::HelpView,
     pub(crate) volume_slider: fltk::valuator::HorFillSlider,
@@ -44,12 +49,17 @@ impl Application {
         let load = main_window::update_widgets_from_config(&mut widgets);
         let mut volume_slider = widgets.volume_slider.clone();
         let mut time_slider = widgets.time_slider.clone();
-        let app = Self {
+        let mut app = Self {
             app,
             main_window: widgets.main_window,
+            prev_button: widgets.prev_button,
+            replay_button: widgets.replay_button,
             play_pause_button: widgets.play_pause_button,
+            next_button: widgets.next_button,
             history_menu_button: widgets.history_menu_button,
             bookmarks_menu_button: widgets.bookmarks_menu_button,
+            add_bookmark_button: widgets.add_bookmark_button,
+            delete_bookmark_button: widgets.delete_bookmark_button,
             menu_button: widgets.menu_button,
             info_view: widgets.info_view,
             volume_slider: widgets.volume_slider,
@@ -81,6 +91,8 @@ impl Application {
             fltk::app::add_timeout3(0.01, move |_| {
                 sender.send(Action::OnStartup);
             });
+        } else {
+            app.update_ui();
         }
         app
     }
@@ -90,6 +102,9 @@ impl Application {
             if let Some(action) = self.receiver.recv() {
                 match action {
                     Action::OnStartup => self.on_startup(),
+                    Action::OnBookmarkMenu => self.on_bookmark_menu(),
+                    Action::OnHistoryMenu => self.on_history_menu(),
+                    Action::OnMenuMenu => self.on_menu_menu(),
                     Action::Load => self.on_open(),
                     Action::Previous => self.on_previous(),
                     Action::Replay => self.on_replay(),
@@ -147,34 +162,34 @@ impl Application {
                 config.bookmarks.len() > 0,
             )
         };
-        /*
-        if has_track { // ENABLE
-            self.play_pause_button
-            self.replay_button
-            self.prev_button
-            self.next_button
+        let button_trigger = fltk::enums::CallbackTrigger::Release;
+        let no_trigger = fltk::enums::CallbackTrigger::Never;
+        let trigger = if has_track { button_trigger } else { no_trigger };
+        self.prev_button.set_trigger(trigger);
+        self.replay_button.set_trigger(trigger);
+        self.play_pause_button.set_trigger(trigger);
+        self.next_button.set_trigger(trigger);
+        if has_track {
             self.time_slider
-            self.add_bookmark_button
-        } else { // DISABLE
-            self.play_pause_button
-            self.replay_button
-            self.prev_button
-            self.next_button
-            self.time_slider
-            self.add_bookmark_button
+                .set_trigger(fltk::enums::CallbackTrigger::Changed);
+        } else {
+            self.time_slider.set_trigger(no_trigger);
         }
-        if has_history { // ENABLE
-            self.history_menu_button
-        } else { // DISABLE
-            self.history_menu_button
+        self.add_bookmark_button.set_trigger(trigger);
+        let menu_trigger = fltk::enums::CallbackTrigger::NotChanged
+            | fltk::enums::CallbackTrigger::Release
+            | fltk::enums::CallbackTrigger::ReleaseAlways;
+        if has_history {
+            self.history_menu_button.set_trigger(menu_trigger);
+        } else {
+            self.history_menu_button.set_trigger(no_trigger);
         }
-        if has_bookmarks { // ENABLE
-            self.bookmarks_menu_button
-            self.delete_bookmark_button
-        } else { // DISABLE
-            self.bookmarks_menu_button
-            self.delete_bookmark_button
+        if has_bookmarks {
+            self.bookmarks_menu_button.set_trigger(menu_trigger);
+            self.delete_bookmark_button.set_trigger(button_trigger);
+        } else {
+            self.bookmarks_menu_button.set_trigger(no_trigger);
+            self.delete_bookmark_button.set_trigger(no_trigger);
         }
-        */
     }
 }

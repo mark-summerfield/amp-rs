@@ -14,9 +14,14 @@ use fltk::prelude::*;
 
 pub struct Widgets {
     pub main_window: fltk::window::Window,
+    pub prev_button: fltk::button::Button,
+    pub replay_button: fltk::button::Button,
     pub play_pause_button: fltk::button::Button,
+    pub next_button: fltk::button::Button,
     pub history_menu_button: fltk::menu::MenuButton,
     pub bookmarks_menu_button: fltk::menu::MenuButton,
+    pub add_bookmark_button: fltk::button::Button,
+    pub delete_bookmark_button: fltk::button::Button,
     pub menu_button: fltk::menu::MenuButton,
     pub info_view: fltk::misc::HelpView,
     pub volume_slider: fltk::valuator::HorFillSlider,
@@ -50,9 +55,14 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
         add_slider_row(width, TIME_ICON, "0″/0″");
     vbox.set_size(&time_box, BUTTON_HEIGHT);
     let (
+        prev_button,
+        replay_button,
         play_pause_button,
+        next_button,
         history_menu_button,
         bookmarks_menu_button,
+        add_bookmark_button,
+        delete_bookmark_button,
         menu_button,
         toolbar,
     ) = add_toolbar(sender, width);
@@ -61,9 +71,14 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
     main_window.end();
     Widgets {
         main_window,
+        prev_button,
+        replay_button,
         play_pause_button,
+        next_button,
         history_menu_button,
         bookmarks_menu_button,
+        add_bookmark_button,
+        delete_bookmark_button,
         menu_button,
         info_view,
         volume_slider,
@@ -87,8 +102,13 @@ fn add_toolbar(
     width: i32,
 ) -> (
     fltk::button::Button,
+    fltk::button::Button,
+    fltk::button::Button,
+    fltk::button::Button,
     fltk::menu::MenuButton,
     fltk::menu::MenuButton,
+    fltk::button::Button,
+    fltk::button::Button,
     fltk::menu::MenuButton,
     fltk::group::Flex,
 ) {
@@ -105,7 +125,7 @@ fn add_toolbar(
         LOAD_ICON,
         &mut button_box,
     );
-    add_toolbutton(
+    let prev_button = add_toolbutton(
         sender,
         fltk::enums::Shortcut::from_key(fltk::enums::Key::F4),
         "Previous track • F4",
@@ -113,7 +133,7 @@ fn add_toolbar(
         PREV_ICON,
         &mut button_box,
     );
-    add_toolbutton(
+    let replay_button = add_toolbutton(
         sender,
         fltk::enums::Shortcut::from_char('r'),
         "Replay the current track • r or F5",
@@ -129,7 +149,7 @@ fn add_toolbar(
         PLAY_ICON,
         &mut button_box,
     );
-    add_toolbutton(
+    let next_button = add_toolbutton(
         sender,
         fltk::enums::Shortcut::from_key(fltk::enums::Key::F6),
         "Next track • F6",
@@ -138,17 +158,25 @@ fn add_toolbar(
         &mut button_box,
     );
     fltk::frame::Frame::default().with_size(PAD, PAD);
-    let mut history_menu_button =
-        add_menubutton(0x68, "History • h", HISTORY_ICON, &mut button_box);
+    let mut history_menu_button = add_menubutton(
+        sender,
+        Action::OnHistoryMenu,
+        0x68,
+        "History • h",
+        HISTORY_ICON,
+        &mut button_box,
+    );
     populate_history_menu_button(&mut history_menu_button, sender);
     let mut bookmarks_menu_button = add_menubutton(
+        sender,
+        Action::OnBookmarkMenu,
         0x62,
         "Bookmarks • b",
         BOOKMARKS_ICON,
         &mut button_box,
     );
     populate_bookmarks_menu_button(&mut bookmarks_menu_button, sender);
-    add_toolbutton(
+    let add_bookmark_button = add_toolbutton(
         sender,
         fltk::enums::Shortcut::from_char('a'),
         "Add Track to Bookmarks • a",
@@ -156,7 +184,7 @@ fn add_toolbar(
         ADD_BOOKMARK_ICON,
         &mut button_box,
     );
-    add_toolbutton(
+    let delete_bookmark_button = add_toolbutton(
         sender,
         fltk::enums::Shortcut::from_char('d'),
         "Delete Track from Bookmarks • d",
@@ -165,14 +193,25 @@ fn add_toolbar(
         &mut button_box,
     );
     fltk::frame::Frame::default().with_size(PAD, PAD);
-    let mut menu_button =
-        add_menubutton(0x6D, "Menu • m", MENU_ICON, &mut button_box);
+    let mut menu_button = add_menubutton(
+        sender,
+        Action::OnMenuMenu,
+        0x6D,
+        "Menu • m",
+        MENU_ICON,
+        &mut button_box,
+    );
     initialize_menu_button(&mut menu_button, sender);
     button_box.end();
     (
+        prev_button,
+        replay_button,
         play_pause_button,
+        next_button,
         history_menu_button,
         bookmarks_menu_button,
+        add_bookmark_button,
+        delete_bookmark_button,
         menu_button,
         button_box,
     )
@@ -202,6 +241,8 @@ fn add_toolbutton(
 }
 
 fn add_menubutton(
+    sender: fltk::app::Sender<Action>,
+    action: Action,
     codepoint: i32,
     tooltip: &str,
     icon: &str,
@@ -220,7 +261,7 @@ fn add_menubutton(
         if event == fltk::enums::Event::KeyUp
             && fltk::app::event_key().bits() == codepoint
         {
-            button.popup();
+            sender.send(action);
             return true;
         }
         false

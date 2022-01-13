@@ -47,6 +47,12 @@ impl Application {
     }
 
     pub(crate) fn on_replay(&mut self) {
+        {
+            let config = CONFIG.get().read().unwrap();
+            if !config.track.exists() {
+                return;
+            }
+        }
         if self.playing {
             self.on_play_or_pause(); // PAUSE
         }
@@ -81,6 +87,12 @@ impl Application {
     }
 
     pub(crate) fn on_space_pressed(&mut self) {
+        {
+            let config = CONFIG.get().read().unwrap();
+            if !config.track.exists() {
+                return;
+            }
+        }
         self.play_pause_button.set_value(true);
         let mut play_pause_button = self.play_pause_button.clone();
         fltk::app::add_timeout3(TINY_TIMEOUT, move |_| {
@@ -285,6 +297,30 @@ impl Application {
             util::humanized_time(self.wav.length())
         ));
         fltk::app::redraw(); // redraws the world
+    }
+
+    pub(crate) fn on_menu_menu(&mut self) {
+        self.menu_button.popup();
+    }
+
+    pub(crate) fn on_bookmark_menu(&mut self) {
+        {
+            let config = CONFIG.get().read().unwrap();
+            if config.bookmarks.len() == 0 {
+                return;
+            }
+        }
+        self.bookmarks_menu_button.popup();
+    }
+
+    pub(crate) fn on_history_menu(&mut self) {
+        {
+            let config = CONFIG.get().read().unwrap();
+            if config.history.len() == 0 {
+                return;
+            }
+        }
+        self.history_menu_button.popup();
     }
 
     pub(crate) fn on_add_to_history(&mut self) {
