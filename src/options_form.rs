@@ -129,6 +129,7 @@ fn make_row(
     spinner.set_step(step);
     spinner.set_range(minimum, maximum);
     spinner.set_tooltip(tooltip);
+    spinner.set_wrap(false);
     row.end();
     label.set_callback({
         let mut spinner = spinner.clone();

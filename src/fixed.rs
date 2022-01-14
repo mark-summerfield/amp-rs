@@ -6,7 +6,7 @@ use chrono::prelude::*;
 use std::env;
 
 pub static APPNAME: &str = "AMP";
-pub static VERSION: &str = "1.2.1";
+pub static VERSION: &str = "1.2.2";
 pub static HELP_HTML: &str = include_str!("../data/help.html");
 pub const ICON: &str = include_str!("../images/amp.svg");
 pub const LOAD_ICON: &str = include_str!("../images/document-open.svg");
