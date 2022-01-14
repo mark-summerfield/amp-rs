@@ -324,27 +324,39 @@ impl Application {
     }
 
     pub(crate) fn on_add_to_history(&mut self) {
-        let (track, size) = {
-            let config = CONFIG.get().read().unwrap();
-            if config.history.contains(&config.track) {
-                (None, config.history_size)
-            } else {
-                (Some(config.track.clone()), config.history_size)
-            }
-        };
         let mut changed = false;
-        if let Some(track) = track {
+        {
+            // If current is already in history, move it to front of history
             let mut config = CONFIG.get().write().unwrap();
+            if !config.history.is_empty()
+                && config.history[0] == config.track
+            {
+                return; // current is already first in history
+            }
+            let mut i = 1;
+            while i < config.history.len() {
+                if config.history[i] == config.track {
+                    changed = true;
+                    break;
+                }
+                i += 1;
+            }
+            if changed {
+                config.history.swap(0, i);
+            }
+        }
+        if !changed {
+            // If current not in history add it to the front
+            let mut config = CONFIG.get().write().unwrap();
+            let track = config.track.clone();
+            let size = config.history_size;
             config.history.push_front(track);
             config.history.truncate(size);
-            changed = true;
         }
-        if changed {
-            main_window::populate_history_menu_button(
-                &mut self.history_menu_button,
-                self.sender,
-            );
-        }
+        main_window::populate_history_menu_button(
+            &mut self.history_menu_button,
+            self.sender,
+        );
     }
 
     pub(crate) fn on_load_history_track(&mut self) {
