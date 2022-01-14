@@ -61,19 +61,19 @@ pub fn humanized_time(secs: f64) -> String {
     const MIN_SIGN: char = '′';
     const SEC_SIGN: char = '″';
     if secs <= 0.0 {
-        return format!("0{}", SEC_SIGN);
+        return format!("0{SEC_SIGN}");
     }
     let hrs = (secs / 3600.0).floor();
     let mut secs = secs % 3600.0;
     let mut mins = (secs / 60.0).floor();
     secs %= 60.0;
-    let mut hours = format!("{:.0}", hrs);
-    let mut minutes = format!("{:.0}", mins);
+    let mut hours = format!("{hrs:.0}");
+    let mut minutes = format!("{mins:.0}");
     if minutes == "60" {
         hours = format!("{:.0}", hrs + 1.0);
         mins = 0.0;
     }
-    let mut seconds = format!("{:.0}", secs);
+    let mut seconds = format!("{secs:.0}");
     if seconds == "60" {
         minutes = format!("{:.0}", mins + 1.0);
         seconds.clear();
@@ -94,9 +94,9 @@ pub fn humanized_time(secs: f64) -> String {
         seconds.push(SEC_SIGN);
     }
     if hours.is_empty() && minutes.is_empty() && seconds.is_empty() {
-        format!("0{}", SEC_SIGN)
+        format!("0{SEC_SIGN}")
     } else {
-        format!("{}{}{}", hours, minutes, seconds)
+        format!("{hours}{minutes}{seconds}")
     }
 }
 
@@ -141,9 +141,8 @@ pub fn get_track_data_html(track: &std::path::Path) -> String {
         }
         _ => {
             format!(
-                "<font color=navy><b>{}</b></font><br>
+                "<font color=navy><b>{name}</b></font><br>
                 <font color=#008B8B>{}</font>",
-                name,
                 track.to_string_lossy()
             )
         }

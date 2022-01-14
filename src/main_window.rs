@@ -322,8 +322,7 @@ pub(crate) fn populate_bookmarks_menu_button(
 
 fn track_menu_option(c: char, track: &std::path::Path) -> String {
     format!(
-        "&{} {}",
-        c,
+        "&{c} {}",
         track
             .to_string_lossy()
             .replace(&['\\', '/'][..], &PATH_SEP.to_string())

@@ -73,8 +73,7 @@ impl Config {
             match ini.write_to_file(&self.filename) {
                 Ok(_) => {}
                 Err(err) => self.warning(&format!(
-                    "failed to save configuration: {}",
-                    err
+                    "failed to save configuration: {err}"
                 )),
             }
         }
@@ -82,7 +81,7 @@ impl Config {
 
     fn save_history(&self, ini: &mut ini::Ini) {
         for (i, track) in self.history.iter().enumerate() {
-            let key = format!("{}{}", HISTORY_KEY, i + 1);
+            let key = format!("{HISTORY_KEY}{}", i + 1);
             ini.with_section(Some(HISTORY_SECTION))
                 .set(key, track.to_string_lossy());
         }
@@ -90,14 +89,14 @@ impl Config {
 
     fn save_bookmarks(&self, ini: &mut ini::Ini) {
         for (i, track) in self.bookmarks.iter().enumerate() {
-            let key = format!("{}{}", BOOKMARK_KEY, i + 1);
+            let key = format!("{BOOKMARK_KEY}{}", i + 1);
             ini.with_section(Some(BOOKMARK_SECTION))
                 .set(key, track.to_string_lossy());
         }
     }
 
     fn warning(&self, message: &str) {
-        fltk::dialog::message_title(&format!("Warning — {}", APPNAME));
+        fltk::dialog::message_title(&format!("Warning — {APPNAME}", ));
         fltk::dialog::message(util::x() - 200, util::y() - 100, message);
     }
 }
@@ -131,7 +130,7 @@ fn get_config_filename() -> std::path::PathBuf {
         dir = dirs::home_dir();
     }
     if let Some(dir) = dir {
-        dir.join(format!("{}{}.ini", dot, APPNAME.to_lowercase()))
+        dir.join(format!("{dot}{}.ini", APPNAME.to_lowercase()))
     } else {
         std::path::PathBuf::new()
     }
@@ -200,7 +199,7 @@ fn read_history(properties: &ini::Properties, config: &mut Config) {
     }
     config.history.clear();
     for i in 1..=config.history_size {
-        let key = format!("{}{}", HISTORY_KEY, i);
+        let key = format!("{HISTORY_KEY}{i}");
         if let Some(value) = properties.get(&key) {
             let value = std::path::PathBuf::from(value);
             if !config.history.contains(&value) && value.exists() {
@@ -213,7 +212,7 @@ fn read_history(properties: &ini::Properties, config: &mut Config) {
 fn read_bookmarks(properties: &ini::Properties, config: &mut Config) {
     config.bookmarks.clear();
     for i in 1..=BOOKMARKS_SIZE {
-        let key = format!("{}{}", BOOKMARK_KEY, i);
+        let key = format!("{BOOKMARK_KEY}{i}");
         if let Some(value) = properties.get(&key) {
             let value = std::path::PathBuf::from(value);
             if !config.bookmarks.contains(&value) && value.exists() {

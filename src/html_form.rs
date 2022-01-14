@@ -53,7 +53,7 @@ fn make_widgets(
     if let Some(window) = fltk::app::first_window() {
         form.set_pos(window.x() + 50, window.y() + 100);
     }
-    form.set_label(&format!("{} — {}", title, APPNAME));
+    form.set_label(&format!("{title} — {APPNAME}"));
     form.make_resizable(resizable);
     form.set_icon(Some(image));
     let mut vbox = fltk::group::Flex::default().size_of_parent().column();

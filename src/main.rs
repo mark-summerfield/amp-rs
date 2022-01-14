@@ -21,7 +21,7 @@ pub static CONFIG: state::Storage<sync::RwLock<config::Config>> =
 fn main() {
     panic::set_hook(Box::new(|info| {
         let err = dbg!(&info);
-        fltk::dialog::message_title(&format!("Error — {}", APPNAME));
+        fltk::dialog::message_title(&format!("Error — {APPNAME}"));
         let x = util::x() - 200;
         let y = util::y() - 100;
         fltk::dialog::message(x, y, &err.to_string());

@@ -24,7 +24,7 @@ impl Application {
         let mut form = fltk::dialog::FileDialog::new(
             fltk::dialog::FileDialogType::BrowseFile,
         );
-        form.set_title(&format!("Choose Track — {}", APPNAME));
+        form.set_title(&format!("Choose Track — {APPNAME}"));
         let _ = form.set_directory(&util::get_track_dir()); // Ignore error
         form.set_filter("Audio Files\t*.{flac,mogg,mp3,oga,ogg,wav}");
         form.show();

@@ -66,7 +66,7 @@ fn make_form() -> fltk::window::Window {
     let image = fltk::image::SvgImage::from_data(ICON).unwrap();
     let mut form = fltk::window::Window::default()
         .with_size(WIDTH, HEIGHT)
-        .with_label(&format!("Configure — {}", APPNAME));
+        .with_label(&format!("Configure — {APPNAME}"));
     if let Some(window) = fltk::app::first_window() {
         form.set_pos(window.x() + 50, window.y() + 100);
     }
@@ -93,7 +93,7 @@ fn make_spinners() -> Spinners {
     let history_size_spinner = make_row(
         "&History Size",
         config.history_size as f64,
-        &format!("The maximum number of tracks to keep in the history menu (default {})", DEF_HISTORY_SIZE),
+        &format!("The maximum number of tracks to keep in the history menu (default {DEF_HISTORY_SIZE})", ),
         MIN_HISTORY_SIZE as f64,
         MAX_HISTORY_SIZE as f64,
         1.0,
