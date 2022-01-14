@@ -1,10 +1,10 @@
 [package]
 name = "amp-rs"
-version = "1.2.0"
+version = "1.2.1"
 edition = "2021"
 publish = true
 authors = [ "Mark Summerfield <mark@qtrac.eu>",]
-include = [ "Cargo.toml", "src/**/*.rs", "images/*",]
+include = [ "Cargo.toml", "src/**/*.rs", "images/*", "data/*",]
 description = "AMP (Another Music Player)"
 homepage = "https://github.com/mark-summerfield/amp-rs"
 readme = "README.md"
