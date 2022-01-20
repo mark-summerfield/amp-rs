@@ -4,7 +4,7 @@ src/application.rs
 src/actions.rs
 src/main_window.rs
 src/html_form.rs
-src/options_form.rs # TODO stop spinners from wrapping
+src/options_form.rs
 src/fixed.rs # VERSION
 src/util.rs
 

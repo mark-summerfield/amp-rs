@@ -16,7 +16,7 @@ checksum = "739f4a8db6605981345c5654f3a85b056ce52f37a39d34da03f25bf2151ea16e"
 
 [[package]]
 name = "amp-rs"
-version = "1.2.2"
+version = "1.2.3"
 dependencies = [
  "chrono",
  "dirs",
@@ -168,8 +168,8 @@ dependencies = [
 
 [[package]]
 name = "fltk"
-version = "1.2.27"
-source = "git+https://github.com/fltk-rs/fltk-rs#989d11d58912a1271dcc9dc288a167cf8ba4c0ea"
+version = "1.2.28"
+source = "git+https://github.com/fltk-rs/fltk-rs#f64940b57d9d810234aee79924a71b547257bfe0"
 dependencies = [
  "bitflags",
  "crossbeam-channel",
@@ -180,8 +180,8 @@ dependencies = [
 
 [[package]]
 name = "fltk-sys"
-version = "1.2.27"
-source = "git+https://github.com/fltk-rs/fltk-rs#989d11d58912a1271dcc9dc288a167cf8ba4c0ea"
+version = "1.2.28"
+source = "git+https://github.com/fltk-rs/fltk-rs#f64940b57d9d810234aee79924a71b547257bfe0"
 dependencies = [
  "cmake",
 ]
@@ -233,9 +233,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.112"
+version = "0.2.113"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b03d17f364a3a042d5e5d46b053bbbf82c92c9430c592dd4c064dc6ee997125"
+checksum = "eef78b64d87775463c549fbd80e19249ef436ea3bf1de2a1eb7e717ec7fab1e9"
 
 [[package]]
 name = "lofty"
@@ -598,9 +598,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.74"
+version = "1.0.75"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee2bb9cd061c5865d345bb02ca49fcef1391741b672b54a0bf7b679badec3142"
+checksum = "c059c05b48c5c0067d4b4b2b4f0732dd65feb52daf7e0ea09cd87e7dadc1af79"
 dependencies = [
  "itoa",
  "ryu",
@@ -625,7 +625,7 @@ checksum = "f2dd574626839106c320a323308629dcb1acfc96e32a8cba364ddc61ac23ee83"
 [[package]]
 name = "soloud"
 version = "1.0.1"
-source = "git+https://github.com/moalyousef/soloud-rs#303e869fb99bdaf7f8496eb3d5a28f5ce4c59a70"
+source = "git+https://github.com/moalyousef/soloud-rs#ebd9da9a613ef55cd64ab8075da072921e5936f9"
 dependencies = [
  "bitflags",
  "paste",
@@ -635,7 +635,7 @@ dependencies = [
 [[package]]
 name = "soloud-sys"
 version = "1.0.1"
-source = "git+https://github.com/moalyousef/soloud-rs#303e869fb99bdaf7f8496eb3d5a28f5ce4c59a70"
+source = "git+https://github.com/moalyousef/soloud-rs#ebd9da9a613ef55cd64ab8075da072921e5936f9"
 dependencies = [
  "cmake",
 ]
@@ -651,9 +651,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.85"
+version = "1.0.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a684ac3dcd8913827e18cd09a68384ee66c1de24157e3c556c9ab16d85695fb7"
+checksum = "8a65b3f4ffa0092e9887669db0eae07941f023991ab58ea44da8fe8e2d511c6b"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -724,9 +724,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-subscriber"
-version = "0.3.5"
+version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d81bfa81424cc98cb034b837c985b7a290f592e5b4322f353f94a0ab0f9f594"
+checksum = "77be66445c4eeebb934a7340f227bfe7b338173d3f8c00a60a5a58005c9faecf"
 dependencies = [
  "ansi_term",
  "lazy_static",
