@@ -11,7 +11,7 @@ Tested on Linux and Windows.
 ![Screenshot](screenshot.png)
 
 `amp.exe` *is a precompiled Windows binary that should run on any
-64-bit version of Windows* (2.4MB; MD5 1bdd82e646cedebe4c9311686b28e340)
+64-bit version of Windows* (2.4MB; MD5 0926b36cbcb8bff956033e1dfcc01de7)
 
 ## Versions
 
