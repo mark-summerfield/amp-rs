@@ -13,11 +13,12 @@ mod util;
 
 use crate::application::Application;
 use crate::fixed::APPNAME;
+use config::Config;
 use fltk::dialog;
+use state::Storage;
 use std::{panic, sync};
 
-pub static CONFIG: state::Storage<sync::RwLock<config::Config>> =
-    state::Storage::new();
+pub static CONFIG: Storage<sync::RwLock<Config>> = Storage::new();
 
 fn main() {
     panic::set_hook(Box::new(|info| {
