@@ -3,10 +3,12 @@
 
 use crate::util::capitalize_first;
 use chrono::prelude::*;
+use fltk::app;
+use soloud::Soloud;
 use std::env;
 
 pub static APPNAME: &str = "AMP";
-pub static VERSION: &str = "1.2.3";
+pub static VERSION: &str = "1.2.4";
 pub static HELP_HTML: &str = include_str!("../data/help.html");
 pub const ICON: &str = include_str!("../images/amp.svg");
 pub const LOAD_ICON: &str = include_str!("../images/document-open.svg");
@@ -80,7 +82,7 @@ pub enum Action {
     VolumeUpdate,
 }
 
-pub fn about_html(player: &soloud::Soloud) -> String {
+pub fn about_html(player: &Soloud) -> String {
     let year = Local::today().year();
     let year = if year == 2021 {
         year.to_string()
@@ -108,8 +110,8 @@ Rust {} • fltk-rs {} • FLTK {}<br>Soloud {}/{} • {}/{}
         VERSION,
         year,
         rustc_version_runtime::version(),
-        fltk::app::crate_version(),
-        fltk::app::version_str(),
+        app::crate_version(),
+        app::version_str(),
         player.version(),
         player.backend_string(),
         capitalize_first(env::consts::OS),

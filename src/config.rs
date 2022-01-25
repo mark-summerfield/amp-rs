@@ -7,10 +7,12 @@ use crate::fixed::{
     WINDOW_WIDTH_MIN,
 };
 use crate::util;
-use std::collections::VecDeque;
+use fltk::{app, dialog};
+use ini::Ini;
+use std::{collections::VecDeque, env, path::PathBuf};
 
-type History = VecDeque<std::path::PathBuf>;
-type Bookmarks = Vec<std::path::PathBuf>;
+type History = VecDeque<PathBuf>;
+type Bookmarks = Vec<PathBuf>;
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -21,8 +23,8 @@ pub struct Config {
     pub window_scale: f32,
     pub volume: f64,
     pub pos: f64,
-    pub track: std::path::PathBuf,
-    pub filename: std::path::PathBuf,
+    pub track: PathBuf,
+    pub filename: PathBuf,
     pub history_size: usize,
     pub history: History,
     pub bookmarks: Bookmarks,
@@ -34,7 +36,7 @@ impl Config {
             filename: get_config_filename(),
             ..Default::default()
         };
-        if let Ok(ini) = ini::Ini::load_from_file(&config.filename) {
+        if let Ok(ini) = Ini::load_from_file(&config.filename) {
             if let Some(properties) = ini.section(Some(WINDOW_SECTION)) {
                 read_window_properties(properties, &mut config);
             }
@@ -55,13 +57,13 @@ impl Config {
         if self.filename.to_string_lossy() == "" {
             self.warning("failed to save configuration: no filename");
         } else {
-            let mut ini = ini::Ini::new();
+            let mut ini = Ini::new();
             ini.with_section(Some(WINDOW_SECTION))
                 .set(X_KEY, self.window_x.to_string())
                 .set(Y_KEY, self.window_y.to_string())
                 .set(WIDTH_KEY, self.window_width.to_string())
                 .set(HEIGHT_KEY, self.window_height.to_string())
-                .set(SCALE_KEY, fltk::app::screen_scale(0).to_string());
+                .set(SCALE_KEY, app::screen_scale(0).to_string());
             ini.with_section(Some(TRACK_SECTION))
                 .set(VOLUME_KEY, self.volume.to_string())
                 .set(POS_KEY, self.pos.to_string())
@@ -79,7 +81,7 @@ impl Config {
         }
     }
 
-    fn save_history(&self, ini: &mut ini::Ini) {
+    fn save_history(&self, ini: &mut Ini) {
         for (i, track) in self.history.iter().enumerate() {
             let key = format!("{HISTORY_KEY}{}", i + 1);
             ini.with_section(Some(HISTORY_SECTION))
@@ -87,7 +89,7 @@ impl Config {
         }
     }
 
-    fn save_bookmarks(&self, ini: &mut ini::Ini) {
+    fn save_bookmarks(&self, ini: &mut Ini) {
         for (i, track) in self.bookmarks.iter().enumerate() {
             let key = format!("{BOOKMARK_KEY}{}", i + 1);
             ini.with_section(Some(BOOKMARK_SECTION))
@@ -96,8 +98,8 @@ impl Config {
     }
 
     fn warning(&self, message: &str) {
-        fltk::dialog::message_title(&format!("Warning — {APPNAME}", ));
-        fltk::dialog::message(util::x() - 200, util::y() - 100, message);
+        dialog::message_title(&format!("Warning — {APPNAME}",));
+        dialog::message(util::x() - 200, util::y() - 100, message);
     }
 }
 
@@ -111,8 +113,8 @@ impl Default for Config {
             window_scale: 1.0,
             volume: 0.5,
             pos: 0.0,
-            track: std::path::PathBuf::new(),
-            filename: std::path::PathBuf::new(),
+            track: PathBuf::new(),
+            filename: PathBuf::new(),
             history_size: DEF_HISTORY_SIZE,
             history: History::new(),
             bookmarks: Bookmarks::new(),
@@ -120,11 +122,11 @@ impl Default for Config {
     }
 }
 
-fn get_config_filename() -> std::path::PathBuf {
+fn get_config_filename() -> PathBuf {
     let mut dir = dirs::config_dir();
     let mut dot = "";
     if dir.is_none() {
-        if std::env::consts::FAMILY == "unix" {
+        if env::consts::FAMILY == "unix" {
             dot = ".";
         }
         dir = dirs::home_dir();
@@ -132,7 +134,7 @@ fn get_config_filename() -> std::path::PathBuf {
     if let Some(dir) = dir {
         dir.join(format!("{dot}{}.ini", APPNAME.to_lowercase()))
     } else {
-        std::path::PathBuf::new()
+        PathBuf::new()
     }
 }
 
@@ -140,8 +142,8 @@ fn read_window_properties(
     properties: &ini::Properties,
     config: &mut Config,
 ) {
-    let max_x = (fltk::app::screen_size().0 - 100.0) as i32;
-    let max_y = (fltk::app::screen_size().1 - 100.0) as i32;
+    let max_x = (app::screen_size().0 - 100.0) as i32;
+    let max_y = (app::screen_size().1 - 100.0) as i32;
     if let Some(value) = properties.get(X_KEY) {
         config.window_x = util::get_num(value, 0, max_x, config.window_x)
     }
@@ -168,7 +170,7 @@ fn read_window_properties(
         config.window_scale =
             util::get_num(value, SCALE_MIN, SCALE_MAX, config.window_scale);
         if !util::isone32(config.window_scale) {
-            fltk::app::set_screen_scale(0, config.window_scale);
+            app::set_screen_scale(0, config.window_scale);
         }
     }
 }
@@ -184,7 +186,7 @@ fn read_track_properties(
         config.pos = util::get_num(value, 0.0, f64::MAX, config.pos)
     }
     if let Some(value) = properties.get(TRACK_KEY) {
-        config.track = std::path::PathBuf::from(value);
+        config.track = PathBuf::from(value);
     }
 }
 
@@ -201,7 +203,7 @@ fn read_history(properties: &ini::Properties, config: &mut Config) {
     for i in 1..=config.history_size {
         let key = format!("{HISTORY_KEY}{i}");
         if let Some(value) = properties.get(&key) {
-            let value = std::path::PathBuf::from(value);
+            let value = PathBuf::from(value);
             if !config.history.contains(&value) && value.exists() {
                 config.history.push_back(value);
             }
@@ -214,7 +216,7 @@ fn read_bookmarks(properties: &ini::Properties, config: &mut Config) {
     for i in 1..=BOOKMARKS_SIZE {
         let key = format!("{BOOKMARK_KEY}{i}");
         if let Some(value) = properties.get(&key) {
-            let value = std::path::PathBuf::from(value);
+            let value = PathBuf::from(value);
             if !config.bookmarks.contains(&value) && value.exists() {
                 config.bookmarks.push(value);
             }

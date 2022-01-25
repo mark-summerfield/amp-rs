@@ -2,10 +2,13 @@
 // License: GPLv3
 
 use crate::fixed::{APPNAME, BUTTON_HEIGHT, BUTTON_WIDTH, ICON};
-use fltk::prelude::*;
+use fltk::{
+    app, button::Button, enums::Font, frame::Frame, group::Flex,
+    image::SvgImage, misc::HelpView, prelude::*, window::Window,
+};
 
 pub struct Form {
-    form: fltk::window::Window,
+    form: Window,
 }
 
 impl Form {
@@ -24,7 +27,7 @@ impl Form {
         form.show();
         if modal {
             while form.shown() {
-                fltk::app::wait();
+                app::wait();
             }
         }
         Self { form }
@@ -37,7 +40,7 @@ impl Form {
 
 impl Drop for Form {
     fn drop(&mut self) {
-        fltk::app::delete_widget(self.form.clone());
+        app::delete_widget(self.form.clone());
     }
 }
 
@@ -47,25 +50,24 @@ fn make_widgets(
     width: i32,
     height: i32,
     resizable: bool,
-) -> (fltk::window::Window, fltk::button::Button) {
-    let image = fltk::image::SvgImage::from_data(ICON).unwrap();
-    let mut form = fltk::window::Window::new(0, 0, width, height, "");
-    if let Some(window) = fltk::app::first_window() {
+) -> (Window, Button) {
+    let image = SvgImage::from_data(ICON).unwrap();
+    let mut form = Window::new(0, 0, width, height, "");
+    if let Some(window) = app::first_window() {
         form.set_pos(window.x() + 50, window.y() + 100);
     }
     form.set_label(&format!("{title} — {APPNAME}"));
     form.make_resizable(resizable);
     form.set_icon(Some(image));
-    let mut vbox = fltk::group::Flex::default().size_of_parent().column();
-    let mut view = fltk::misc::HelpView::default();
+    let mut vbox = Flex::default().size_of_parent().column();
+    let mut view = HelpView::default();
     view.set_value(html_text);
-    view.set_text_font(fltk::enums::Font::Helvetica);
+    view.set_text_font(Font::Helvetica);
     view.set_text_size((view.text_size() as f64 * 1.2) as i32);
-    let mut button_row =
-        fltk::group::Flex::default().size_of_parent().row();
-    fltk::frame::Frame::default(); // pad left of button
-    let ok_button = fltk::button::Button::default().with_label("&OK");
-    fltk::frame::Frame::default(); // pad right of button
+    let mut button_row = Flex::default().size_of_parent().row();
+    Frame::default(); // pad left of button
+    let ok_button = Button::default().with_label("&OK");
+    Frame::default(); // pad right of button
     button_row.set_size(&ok_button, BUTTON_WIDTH);
     button_row.end();
     vbox.set_size(&button_row, BUTTON_HEIGHT);
@@ -74,10 +76,7 @@ fn make_widgets(
     (form, ok_button)
 }
 
-fn add_event_handler(
-    form: &mut fltk::window::Window,
-    ok_button: &mut fltk::button::Button,
-) {
+fn add_event_handler(form: &mut Window, ok_button: &mut Button) {
     ok_button.set_callback({
         let mut form = form.clone();
         move |_| {

@@ -5,46 +5,55 @@ use super::CONFIG;
 use crate::fixed::Action;
 use crate::html_form;
 use crate::main_window;
-use fltk::prelude::*;
-use soloud::prelude::*;
+use fltk::{
+    app,
+    app::{channel, App, Receiver, Scheme, Sender},
+    button::Button,
+    frame::Frame,
+    menu::MenuButton,
+    misc::HelpView,
+    prelude::*,
+    valuator::HorFillSlider,
+    window::Window,
+};
+use soloud::{audio::Wav, prelude::*, Soloud};
 
 pub struct Application {
-    pub(crate) app: fltk::app::App,
-    pub(crate) main_window: fltk::window::Window,
-    pub(crate) prev_button: fltk::button::Button,
-    pub(crate) replay_button: fltk::button::Button,
-    pub(crate) play_pause_button: fltk::button::Button,
-    pub(crate) next_button: fltk::button::Button,
-    pub(crate) history_menu_button: fltk::menu::MenuButton,
-    pub(crate) bookmarks_menu_button: fltk::menu::MenuButton,
-    pub(crate) add_bookmark_button: fltk::button::Button,
-    pub(crate) delete_bookmark_button: fltk::button::Button,
-    pub(crate) menu_button: fltk::menu::MenuButton,
-    pub(crate) info_view: fltk::misc::HelpView,
-    pub(crate) volume_slider: fltk::valuator::HorFillSlider,
-    pub(crate) volume_label: fltk::frame::Frame,
-    pub(crate) time_slider: fltk::valuator::HorFillSlider,
-    pub(crate) time_label: fltk::frame::Frame,
+    pub(crate) app: App,
+    pub(crate) main_window: Window,
+    pub(crate) prev_button: Button,
+    pub(crate) replay_button: Button,
+    pub(crate) play_pause_button: Button,
+    pub(crate) next_button: Button,
+    pub(crate) history_menu_button: MenuButton,
+    pub(crate) bookmarks_menu_button: MenuButton,
+    pub(crate) add_bookmark_button: Button,
+    pub(crate) delete_bookmark_button: Button,
+    pub(crate) menu_button: MenuButton,
+    pub(crate) info_view: HelpView,
+    pub(crate) volume_slider: HorFillSlider,
+    pub(crate) volume_label: Frame,
+    pub(crate) time_slider: HorFillSlider,
+    pub(crate) time_label: Frame,
     pub(crate) helpform: Option<html_form::Form>,
-    pub(crate) player: soloud::Soloud,
-    pub(crate) wav: soloud::audio::Wav,
+    pub(crate) player: Soloud,
+    pub(crate) wav: Wav,
     pub(crate) handle: soloud::Handle,
     pub(crate) playing: bool,
     pub(crate) first_to_play: bool,
-    pub(crate) sender: fltk::app::Sender<Action>,
-    pub(crate) receiver: fltk::app::Receiver<Action>,
+    pub(crate) sender: Sender<Action>,
+    pub(crate) receiver: Receiver<Action>,
 }
 
 impl Application {
     pub fn new() -> Self {
-        let app =
-            fltk::app::App::default().with_scheme(fltk::app::Scheme::Gleam);
-        let (sender, receiver) = fltk::app::channel::<Action>();
+        let app = App::default().with_scheme(Scheme::Gleam);
+        let (sender, receiver) = channel::<Action>();
         let mut widgets = main_window::make(sender);
         main_window::add_event_handlers(&mut widgets.main_window, sender);
         widgets.main_window.show();
         let mut player =
-            soloud::Soloud::default().expect("Cannot access audio backend");
+            Soloud::default().expect("Cannot access audio backend");
         player.set_pause_all(true);
         let load = main_window::update_widgets_from_config(&mut widgets);
         let mut volume_slider = widgets.volume_slider.clone();
@@ -68,7 +77,7 @@ impl Application {
             time_label: widgets.time_label,
             helpform: None,
             player,
-            wav: soloud::audio::Wav::default(),
+            wav: Wav::default(),
             handle: unsafe { soloud::Handle::from_raw(0) },
             playing: false,
             first_to_play: true,
@@ -88,7 +97,7 @@ impl Application {
         if load {
             #[allow(clippy::clone_on_copy)]
             let sender = sender.clone();
-            fltk::app::add_timeout3(0.01, move |_| {
+            app::add_timeout3(0.01, move |_| {
                 sender.send(Action::OnStartup);
             });
         } else {

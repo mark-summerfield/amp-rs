@@ -10,43 +10,55 @@ use crate::fixed::{
     WINDOW_HEIGHT_MIN, WINDOW_WIDTH_MIN,
 };
 use crate::util;
-use fltk::prelude::*;
+use fltk::{
+    app,
+    app::Sender,
+    button::Button,
+    enums::{Event, Font, FrameType, Key, Shortcut},
+    frame::Frame,
+    group::{Flex, FlexType},
+    image::SvgImage,
+    menu::{MenuButton, MenuFlag},
+    misc::HelpView,
+    prelude::*,
+    valuator::HorFillSlider,
+    window::Window,
+};
+use std::path::Path;
 
 pub struct Widgets {
-    pub main_window: fltk::window::Window,
-    pub prev_button: fltk::button::Button,
-    pub replay_button: fltk::button::Button,
-    pub play_pause_button: fltk::button::Button,
-    pub next_button: fltk::button::Button,
-    pub history_menu_button: fltk::menu::MenuButton,
-    pub bookmarks_menu_button: fltk::menu::MenuButton,
-    pub add_bookmark_button: fltk::button::Button,
-    pub delete_bookmark_button: fltk::button::Button,
-    pub menu_button: fltk::menu::MenuButton,
-    pub info_view: fltk::misc::HelpView,
-    pub volume_slider: fltk::valuator::HorFillSlider,
-    pub volume_label: fltk::frame::Frame,
-    pub time_slider: fltk::valuator::HorFillSlider,
-    pub time_label: fltk::frame::Frame,
+    pub main_window: Window,
+    pub prev_button: Button,
+    pub replay_button: Button,
+    pub play_pause_button: Button,
+    pub next_button: Button,
+    pub history_menu_button: MenuButton,
+    pub bookmarks_menu_button: MenuButton,
+    pub add_bookmark_button: Button,
+    pub delete_bookmark_button: Button,
+    pub menu_button: MenuButton,
+    pub info_view: HelpView,
+    pub volume_slider: HorFillSlider,
+    pub volume_label: Frame,
+    pub time_slider: HorFillSlider,
+    pub time_label: Frame,
 }
 
-pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
-    fltk::window::Window::set_default_xclass(APPNAME);
-    let icon = fltk::image::SvgImage::from_data(ICON).unwrap();
+pub fn make(sender: Sender<Action>) -> Widgets {
+    Window::set_default_xclass(APPNAME);
+    let icon = SvgImage::from_data(ICON).unwrap();
     let (x, y, width, height) = get_config_window_rect();
-    let mut main_window =
-        fltk::window::Window::new(x, y, width, height, APPNAME);
+    let mut main_window = Window::new(x, y, width, height, APPNAME);
     main_window.set_icon(Some(icon));
     main_window.size_range(
         WINDOW_WIDTH_MIN,
         WINDOW_HEIGHT_MIN,
-        fltk::app::screen_size().0 as i32,
-        fltk::app::screen_size().1 as i32,
+        app::screen_size().0 as i32,
+        app::screen_size().1 as i32,
     );
     main_window.make_resizable(true);
-    let mut vbox = fltk::group::Flex::default()
-        .size_of_parent()
-        .with_type(fltk::group::FlexType::Column);
+    let mut vbox =
+        Flex::default().size_of_parent().with_type(FlexType::Column);
     vbox.set_margin(PAD);
     let info_view = add_info_view();
     let (volume_box, volume_slider, volume_label) = add_volume_row(width);
@@ -88,38 +100,38 @@ pub fn make(sender: fltk::app::Sender<Action>) -> Widgets {
     }
 }
 
-fn add_info_view() -> fltk::misc::HelpView {
-    let mut info_view = fltk::misc::HelpView::default();
+fn add_info_view() -> HelpView {
+    let mut info_view = HelpView::default();
     info_view
         .set_value("<font color=green>Click Open to load a track…</font>");
-    info_view.set_text_font(fltk::enums::Font::Helvetica);
+    info_view.set_text_font(Font::Helvetica);
     info_view.set_text_size((info_view.text_size() as f64 * 1.3) as i32);
     info_view
 }
 
 fn add_toolbar(
-    sender: fltk::app::Sender<Action>,
+    sender: Sender<Action>,
     width: i32,
 ) -> (
-    fltk::button::Button,
-    fltk::button::Button,
-    fltk::button::Button,
-    fltk::button::Button,
-    fltk::menu::MenuButton,
-    fltk::menu::MenuButton,
-    fltk::button::Button,
-    fltk::button::Button,
-    fltk::menu::MenuButton,
-    fltk::group::Flex,
+    Button,
+    Button,
+    Button,
+    Button,
+    MenuButton,
+    MenuButton,
+    Button,
+    Button,
+    MenuButton,
+    Flex,
 ) {
-    let mut button_box = fltk::group::Flex::default()
+    let mut button_box = Flex::default()
         .with_size(width, TOOLBAR_HEIGHT)
-        .with_type(fltk::group::FlexType::Row);
-    button_box.set_frame(fltk::enums::FrameType::UpBox);
+        .with_type(FlexType::Row);
+    button_box.set_frame(FrameType::UpBox);
     button_box.set_margin(PAD);
     add_toolbutton(
         sender,
-        fltk::enums::Shortcut::from_char('o'),
+        Shortcut::from_char('o'),
         "Open a track ready to play • o",
         Action::Load,
         LOAD_ICON,
@@ -127,7 +139,7 @@ fn add_toolbar(
     );
     let prev_button = add_toolbutton(
         sender,
-        fltk::enums::Shortcut::from_key(fltk::enums::Key::F4),
+        Shortcut::from_key(Key::F4),
         "Previous track • F4",
         Action::Previous,
         PREV_ICON,
@@ -135,7 +147,7 @@ fn add_toolbar(
     );
     let replay_button = add_toolbutton(
         sender,
-        fltk::enums::Shortcut::from_char('r'),
+        Shortcut::from_char('r'),
         "Replay the current track • r or F5",
         Action::Replay,
         REPLAY_ICON,
@@ -143,7 +155,7 @@ fn add_toolbar(
     );
     let play_pause_button = add_toolbutton(
         sender,
-        fltk::enums::Shortcut::from_char('p'),
+        Shortcut::from_char('p'),
         "Play or Pause the current track • p or Space",
         Action::PlayOrPause,
         PLAY_ICON,
@@ -151,13 +163,13 @@ fn add_toolbar(
     );
     let next_button = add_toolbutton(
         sender,
-        fltk::enums::Shortcut::from_key(fltk::enums::Key::F6),
+        Shortcut::from_key(Key::F6),
         "Next track • F6",
         Action::Next,
         NEXT_ICON,
         &mut button_box,
     );
-    fltk::frame::Frame::default().with_size(PAD, PAD);
+    Frame::default().with_size(PAD, PAD);
     let mut history_menu_button = add_menubutton(
         sender,
         Action::OnHistoryMenu,
@@ -178,7 +190,7 @@ fn add_toolbar(
     populate_bookmarks_menu_button(&mut bookmarks_menu_button, sender);
     let add_bookmark_button = add_toolbutton(
         sender,
-        fltk::enums::Shortcut::from_char('a'),
+        Shortcut::from_char('a'),
         "Add Track to Bookmarks • a",
         Action::AddBookmark,
         ADD_BOOKMARK_ICON,
@@ -186,13 +198,13 @@ fn add_toolbar(
     );
     let delete_bookmark_button = add_toolbutton(
         sender,
-        fltk::enums::Shortcut::from_char('d'),
+        Shortcut::from_char('d'),
         "Delete Track from Bookmarks • d",
         Action::DeleteBookmark,
         DELETE_BOOKMARK_ICON,
         &mut button_box,
     );
-    fltk::frame::Frame::default().with_size(PAD, PAD);
+    Frame::default().with_size(PAD, PAD);
     let mut menu_button = add_menubutton(
         sender,
         Action::OnMenuMenu,
@@ -218,21 +230,21 @@ fn add_toolbar(
 }
 
 fn add_toolbutton(
-    sender: fltk::app::Sender<Action>,
-    shortcut: fltk::enums::Shortcut,
+    sender: Sender<Action>,
+    shortcut: Shortcut,
     tooltip: &str,
     action: Action,
     icon: &str,
-    button_box: &mut fltk::group::Flex,
-) -> fltk::button::Button {
+    button_box: &mut Flex,
+) -> Button {
     let width = TOOLBUTTON_SIZE + PAD + 8;
-    let mut button = fltk::button::Button::default();
+    let mut button = Button::default();
     button.set_size(width, TOOLBUTTON_SIZE + PAD);
     button.visible_focus(false);
     button.set_label_size(0);
     button.set_shortcut(shortcut);
     button.set_tooltip(tooltip);
-    let mut icon = fltk::image::SvgImage::from_data(icon).unwrap();
+    let mut icon = SvgImage::from_data(icon).unwrap();
     icon.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
     button.set_image(Some(icon));
     button.emit(sender, action);
@@ -241,26 +253,24 @@ fn add_toolbutton(
 }
 
 fn add_menubutton(
-    sender: fltk::app::Sender<Action>,
+    sender: Sender<Action>,
     action: Action,
     codepoint: i32,
     tooltip: &str,
     icon: &str,
-    button_box: &mut fltk::group::Flex,
-) -> fltk::menu::MenuButton {
+    button_box: &mut Flex,
+) -> MenuButton {
     let width = TOOLBUTTON_SIZE + PAD + 8;
-    let mut button = fltk::menu::MenuButton::default();
+    let mut button = MenuButton::default();
     button.set_size(width, TOOLBUTTON_SIZE + PAD);
     button.visible_focus(false);
     button.set_label_size(0);
     button.set_tooltip(tooltip);
-    let mut icon = fltk::image::SvgImage::from_data(icon).unwrap();
+    let mut icon = SvgImage::from_data(icon).unwrap();
     icon.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
     button.set_image(Some(icon));
     button.handle(move |_, event| {
-        if event == fltk::enums::Event::KeyUp
-            && fltk::app::event_key().bits() == codepoint
-        {
+        if event == Event::KeyUp && app::event_key().bits() == codepoint {
             sender.send(action);
             return true;
         }
@@ -271,8 +281,8 @@ fn add_menubutton(
 }
 
 pub(crate) fn populate_history_menu_button(
-    menu_button: &mut fltk::menu::MenuButton,
-    sender: fltk::app::Sender<Action>,
+    menu_button: &mut MenuButton,
+    sender: Sender<Action>,
 ) {
     menu_button.clear();
     let config = CONFIG.get().read().unwrap();
@@ -284,8 +294,8 @@ pub(crate) fn populate_history_menu_button(
         }
         menu_button.add_emit(
             &track_menu_option(MENU_CHARS[base + i], track),
-            fltk::enums::Shortcut::None,
-            fltk::menu::MenuFlag::Normal,
+            Shortcut::None,
+            MenuFlag::Normal,
             sender,
             Action::LoadHistoryTrack,
         );
@@ -293,8 +303,8 @@ pub(crate) fn populate_history_menu_button(
 }
 
 pub(crate) fn populate_bookmarks_menu_button(
-    menu_button: &mut fltk::menu::MenuButton,
-    sender: fltk::app::Sender<Action>,
+    menu_button: &mut MenuButton,
+    sender: Sender<Action>,
 ) {
     menu_button.clear();
     let config = CONFIG.get().read().unwrap();
@@ -303,15 +313,15 @@ pub(crate) fn populate_bookmarks_menu_button(
     for (i, track) in config.bookmarks.iter().enumerate() {
         menu_button.add_emit(
             &track_menu_option(MENU_CHARS[base + i], track),
-            fltk::enums::Shortcut::None,
-            fltk::menu::MenuFlag::Normal,
+            Shortcut::None,
+            MenuFlag::Normal,
             sender,
             Action::LoadBookmarkedTrack,
         );
     }
 }
 
-fn track_menu_option(c: char, track: &std::path::Path) -> String {
+fn track_menu_option(c: char, track: &Path) -> String {
     format!(
         "&{c} {}",
         track
@@ -321,44 +331,41 @@ fn track_menu_option(c: char, track: &std::path::Path) -> String {
 }
 
 fn initialize_menu_button(
-    menu_button: &mut fltk::menu::MenuButton,
-    sender: fltk::app::Sender<Action>,
+    menu_button: &mut MenuButton,
+    sender: Sender<Action>,
 ) {
     menu_button.set_label("&Menu");
     menu_button.add_emit(
         "&Options…",
-        fltk::enums::Shortcut::None,
-        fltk::menu::MenuFlag::MenuDivider,
+        Shortcut::None,
+        MenuFlag::MenuDivider,
         sender,
         Action::Options,
     );
     menu_button.add_emit(
         "&Help • F1",
-        fltk::enums::Shortcut::None, // handled elsewhere
-        fltk::menu::MenuFlag::Normal,
+        Shortcut::None, // handled elsewhere
+        MenuFlag::Normal,
         sender,
         Action::Help,
     );
     menu_button.add_emit(
         "&About",
-        fltk::enums::Shortcut::None,
-        fltk::menu::MenuFlag::MenuDivider,
+        Shortcut::None,
+        MenuFlag::MenuDivider,
         sender,
         Action::About,
     );
     menu_button.add_emit(
         "&Quit • Esc",
-        fltk::enums::Shortcut::None, // handled elsewhere
-        fltk::menu::MenuFlag::Normal,
+        Shortcut::None, // handled elsewhere
+        MenuFlag::Normal,
         sender,
         Action::Quit,
     );
 }
 
-fn add_volume_row(
-    width: i32,
-) -> (fltk::group::Flex, fltk::valuator::HorFillSlider, fltk::frame::Frame)
-{
+fn add_volume_row(width: i32) -> (Flex, HorFillSlider, Frame) {
     let (volume_box, mut volume_slider, volume_label) =
         add_slider_row(width, VOLUME_ICON, "0%");
     volume_slider.set_range(0.0, 1.0);
@@ -370,24 +377,23 @@ fn add_slider_row(
     width: i32,
     icon: &str,
     label: &str,
-) -> (fltk::group::Flex, fltk::valuator::HorFillSlider, fltk::frame::Frame)
-{
-    let mut row = fltk::group::Flex::default()
+) -> (Flex, HorFillSlider, Frame) {
+    let mut row = Flex::default()
         .with_size(width, TOOLBAR_HEIGHT)
-        .with_type(fltk::group::FlexType::Row);
+        .with_type(FlexType::Row);
     row.set_margin(PAD / 2);
     let icon_height = TOOLBUTTON_SIZE + PAD;
     let icon_width = icon_height + 8;
-    let mut icon_label = fltk::frame::Frame::default();
+    let mut icon_label = Frame::default();
     icon_label.set_size(icon_width, icon_height);
     icon_label.visible_focus(false);
     icon_label.set_label_size(0);
-    let mut icon_image = fltk::image::SvgImage::from_data(icon).unwrap();
+    let mut icon_image = SvgImage::from_data(icon).unwrap();
     icon_image.scale(TOOLBUTTON_SIZE, TOOLBUTTON_SIZE, true, true);
     icon_label.set_image(Some(icon_image));
-    let slider = fltk::valuator::HorFillSlider::default();
-    let mut label = fltk::frame::Frame::default().with_label(label);
-    label.set_frame(fltk::enums::FrameType::EngravedFrame);
+    let slider = HorFillSlider::default();
+    let mut label = Frame::default().with_label(label);
+    label.set_frame(FrameType::EngravedFrame);
     row.set_size(&icon_label, icon_width);
     row.set_size(&label, icon_width * 3);
     row.end();
@@ -416,20 +422,18 @@ fn get_config_window_rect() -> (i32, i32, i32, i32) {
 }
 
 pub fn add_event_handlers(
-    main_window: &mut fltk::window::Window,
-    sender: fltk::app::Sender<Action>,
+    main_window: &mut Window,
+    sender: Sender<Action>,
 ) {
     // Both of these are really needed!
     main_window.set_callback(move |_| {
-        if fltk::app::event() == fltk::enums::Event::Close
-            || fltk::app::event_key() == fltk::enums::Key::Escape
-        {
+        if app::event() == Event::Close || app::event_key() == Key::Escape {
             sender.send(Action::Quit);
         }
     });
     main_window.handle(move |_, event| {
-        if event == fltk::enums::Event::KeyUp {
-            let key = fltk::app::event_key();
+        if event == Event::KeyUp {
+            let key = app::event_key();
             if key.bits() == 0x20 {
                 sender.send(Action::SpacePressed); // Space → Play or Pause
                 return true;
@@ -442,17 +446,16 @@ pub fn add_event_handlers(
                 sender.send(Action::VolumeDown); // -
                 return true;
             }
-            if fltk::app::event_key() == fltk::enums::Key::Help
-                || fltk::app::event_key() == fltk::enums::Key::F1
+            if app::event_key() == Key::Help || app::event_key() == Key::F1
             {
                 sender.send(Action::Help);
                 return true;
             }
-            if fltk::app::event_key() == fltk::enums::Key::F5 {
+            if app::event_key() == Key::F5 {
                 sender.send(Action::Replay);
                 return true;
             }
-            if fltk::app::event_key() == fltk::enums::Key::Menu {
+            if app::event_key() == Key::Menu {
                 sender.send(Action::MainMenu);
                 return true;
             }
