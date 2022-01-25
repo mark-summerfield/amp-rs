@@ -28,7 +28,7 @@ fn main() {
         let y = util::y() - 100;
         dialog::message(x, y, &err.to_string());
     }));
-    CONFIG.set(sync::RwLock::new(config::Config::new()));
+    CONFIG.set(sync::RwLock::new(Config::new()));
     let mut app = Application::new();
     app.run();
 }
