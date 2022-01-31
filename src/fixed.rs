@@ -8,7 +8,7 @@ use soloud::Soloud;
 use std::env;
 
 pub static APPNAME: &str = "AMP";
-pub static VERSION: &str = "1.2.4";
+pub static VERSION: &str = "1.2.5";
 pub static HELP_HTML: &str = include_str!("../data/help.html");
 pub const ICON: &str = include_str!("../images/amp.svg");
 pub const LOAD_ICON: &str = include_str!("../images/document-open.svg");
