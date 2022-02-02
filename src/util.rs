@@ -6,6 +6,7 @@ use fltk::app;
 use lofty::{self, Accessor, ItemKey, ItemValue, Probe};
 use std::{
     cmp,
+    collections::VecDeque,
     path::{Path, PathBuf},
     str,
 };
@@ -255,4 +256,23 @@ fn get_sorted_tracks(track: &Path) -> Vec<PathBuf> {
         }
     }
     tracks
+}
+
+pub fn maybe_add_to_deque<T: cmp::PartialEq>(
+    deque: &mut VecDeque<T>,
+    value: T,
+    max_size: usize,
+) -> bool {
+    if !deque.is_empty() && deque[0] == value {
+        return false; // Already in and already first
+    }
+    for i in 1..deque.len() {
+        if deque[i] == value {
+            deque.remove(i); // Remove from middle
+            break;
+        }
+    }
+    deque.push_front(value); // Add to front
+    deque.truncate(max_size);
+    true
 }
