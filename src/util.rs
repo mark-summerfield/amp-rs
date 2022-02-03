@@ -122,36 +122,52 @@ pub fn get_track_data_html(track: &Path) -> String {
                 text.push_str(&name);
             }
             text.push_str("</b></font><br>");
+            let mut dot = false;
             if !data.album.is_empty() {
                 text.push_str("<font color=green>");
                 text.push_str(&data.album);
                 text.push_str("</font>");
+                dot = true;
             }
             if data.number > 0 {
                 text.push_str("<font color=green>");
-                text.push_str(&format!(" (#{})", data.number));
+                if dot {
+                    text.push(' ');
+                }
+                text.push_str(&format!("(#{})", data.number));
                 text.push_str("</font>");
+                dot = true;
             }
-            if !data.album.is_empty() || data.number > 0 {
-                text.push_str("<br>");
+            if dot {
+                text.push_str(" • ");
+                dot = false;
             }
-            if !data.album.is_empty() {
+            if !data.artist.is_empty() {
                 text.push_str("<font color=green>");
                 text.push_str(&data.artist);
-                text.push_str("</font><br>");
+                text.push_str("</font>");
+                dot = true;
             }
-            text.push_str("<font color=#008B8B>");
+            if data.year != 0 {
+                if dot {
+                    text.push_str(" • ");
+                }
+                text.push_str("<font color=green>");
+                text.push_str(&data.year.to_string());
+                text.push_str("</font>");
+            }
+            if !text.ends_with("<br>") {
+                text.push_str("<br>");
+            }
+            text.push_str("<font color=#008B8B>\"");
             text.push_str(&track.to_string_lossy());
-            text.push_str("</font>");
+            text.push_str("\"</font>");
             text
         }
-        _ => {
-            format!(
-                "<font color=navy><b>{name}</b></font><br>
-                <font color=#008B8B>{}</font>",
-                track.to_string_lossy()
-            )
-        }
+        _ => format!(
+            "<font color=navy><b>{name}</b></font><br>
+                <font color=#008B8B>{track:?}</font>"
+        ),
     }
 }
 
@@ -160,6 +176,7 @@ pub struct TrackData {
     pub album: String,
     pub artist: String,
     pub number: i32,
+    pub year: i32,
 }
 
 fn get_track_tag(track: &Path) -> lofty::Result<Option<TrackData>> {
@@ -194,9 +211,38 @@ fn get_track_tag(track: &Path) -> lofty::Result<Option<TrackData>> {
             } else {
                 0
             },
+            year: {
+                if let Some(date) =
+                    tag.get_string(&ItemKey::OriginalReleaseDate)
+                {
+                    get_year_from_date(date)
+                } else if let Some(date) =
+                    tag.get_string(&ItemKey::RecordingDate)
+                {
+                    get_year_from_date(date)
+                } else if let Some(year) = tag.get_string(&ItemKey::Year) {
+                    match year.parse::<i32>() {
+                        Ok(y) => y,
+                        _ => 0,
+                    }
+                } else {
+                    0
+                }
+            },
         }))
     } else {
         Ok(None)
+    }
+}
+
+fn get_year_from_date(date: &str) -> i32 {
+    if date.len() >= 4 {
+        match date[..4].parse::<i32>() {
+            Ok(year) => year,
+            _ => 0,
+        }
+    } else {
+        0
     }
 }
 
