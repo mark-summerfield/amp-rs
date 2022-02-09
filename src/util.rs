@@ -212,12 +212,11 @@ fn get_track_tag(track: &Path) -> lofty::Result<Option<TrackData>> {
                 0
             },
             year: {
-                if let Some(date) =
-                    tag.get_string(&ItemKey::OriginalReleaseDate)
+                if let Some(date) = tag.get_string(&ItemKey::RecordingDate)
                 {
                     get_year_from_date(date)
                 } else if let Some(date) =
-                    tag.get_string(&ItemKey::RecordingDate)
+                    tag.get_string(&ItemKey::OriginalReleaseDate)
                 {
                     get_year_from_date(date)
                 } else if let Some(year) = tag.get_string(&ItemKey::Year) {
