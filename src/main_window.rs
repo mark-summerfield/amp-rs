@@ -16,7 +16,7 @@ use fltk::{
     button::Button,
     enums::{Event, Font, FrameType, Key, Shortcut},
     frame::Frame,
-    group::{Flex, FlexType},
+    group::Flex,
     image::SvgImage,
     menu::{MenuButton, MenuFlag},
     misc::HelpView,
@@ -57,8 +57,7 @@ pub fn make(sender: Sender<Action>) -> Widgets {
         app::screen_size().1 as i32,
     );
     main_window.make_resizable(true);
-    let mut vbox =
-        Flex::default().size_of_parent().with_type(FlexType::Column);
+    let mut vbox = Flex::default().column().size_of_parent();
     vbox.set_margin(PAD);
     let info_view = add_info_view();
     let (volume_box, volume_slider, volume_label) = add_volume_row(width);
@@ -124,9 +123,8 @@ fn add_toolbar(
     MenuButton,
     Flex,
 ) {
-    let mut button_box = Flex::default()
-        .with_size(width, TOOLBAR_HEIGHT)
-        .with_type(FlexType::Row);
+    let mut button_box =
+        Flex::default().row().with_size(width, TOOLBAR_HEIGHT);
     button_box.set_frame(FrameType::UpBox);
     button_box.set_margin(PAD);
     add_toolbutton(
@@ -378,9 +376,7 @@ fn add_slider_row(
     icon: &str,
     label: &str,
 ) -> (Flex, HorFillSlider, Frame) {
-    let mut row = Flex::default()
-        .with_size(width, TOOLBAR_HEIGHT)
-        .with_type(FlexType::Row);
+    let mut row = Flex::default().row().with_size(width, TOOLBAR_HEIGHT);
     row.set_margin(PAD / 2);
     let icon_height = TOOLBUTTON_SIZE + PAD;
     let icon_width = icon_height + 8;
