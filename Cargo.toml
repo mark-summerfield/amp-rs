@@ -39,4 +39,3 @@ status = "passively-maintained"
 strip = true
 opt-level = "s" # 3 is fastest binary; use "s" for smallest
 lto = true
-codegen-units = 1
