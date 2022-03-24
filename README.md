@@ -9,7 +9,7 @@ the last played track at the exact position it had reached.
 Tested on Linux and Windows.
 
 If you want a player than can also manage playlists see [TLM (Track List
-Manager](https://github.com/mark-summerfield/tlm).
+Manager)](https://github.com/mark-summerfield/tlm).
 
 ![Screenshot](screenshot.png)
 
